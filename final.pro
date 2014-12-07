@@ -5,9 +5,11 @@ TEMPLATE = app
 
 QMAKE_CXXFLAGS += -g
 
+#shadowbuild MUST be off
+
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
-INCLUDEPATH += glm lib
-DEPENDPATH += glm lib
+INCLUDEPATH += glm lib phys
+DEPENDPATH += glm lib phys
 
 SOURCES += main.cpp \
     mainwindow.cpp \
@@ -15,7 +17,9 @@ SOURCES += main.cpp \
     lib/ResourceLoader.cpp \
     watersurfacemodule.cpp \
     OrbitingCamera.cpp \
-    CamtransCamera.cpp
+    CamtransCamera.cpp \
+    phys/entity.cpp \
+    phys/sphere.cpp
 
 HEADERS += mainwindow.h \
     view.h \
@@ -23,7 +27,10 @@ HEADERS += mainwindow.h \
     watersurfacemodule.h \
     Camera.h \
     OrbitingCamera.h \
-    CamtransCamera.h
+    CamtransCamera.h \
+    phys/entity.h \
+    phys/collision.h \
+    phys/sphere.h
 
 FORMS += mainwindow.ui
 
@@ -44,5 +51,3 @@ DEPENDPATH += glew
 DEFINES += GLEW_STATIC __AT_HOME__
 HEADERS += glew/glew.h glew/wglew.h
 SOURCES += glew/glew.c
-
-

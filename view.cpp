@@ -37,7 +37,7 @@ void View::initializeGL()
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     glGetError(); // Clear errors after call to glewInit
-    if (GLEW_OK != err)
+	if(GLEW_OK != err)
     {
       // Problem: glewInit failed, something is seriously wrong.
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
