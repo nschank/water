@@ -20,8 +20,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     p = glm::perspective(55.0f, 1.0f, 0.01f, 10.0f);
-    v = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
+    v = glm::lookAt(glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    m = glm::mat4(1.0f);
 }
 
 View::~View()
@@ -43,7 +43,6 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
-    //m_camera.updateMatrices();
 
     m_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
@@ -66,7 +65,7 @@ void View::initializeGL()
     glBindVertexArray(m_vao);
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), m_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), m_data, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(glGetAttribLocation(m_shader, "position"));
 
@@ -80,7 +79,7 @@ void View::initializeGL()
                 );
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
+    glEnable(GL_DEPTH_TEST);
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
     time.start();
@@ -105,9 +104,9 @@ void View::paintGL()
         fprintf(stderr, "(GL error code %d)\n", err);
     }
 
+    m = glm::translate(glm::vec3(-1.0/100, 0.0, 0.0))*m;
     // Update the scene camera.
     glViewport(0, 0, width(), height());
-    m_camera.setAspectRatio((float)width() / (float)height());
 
     // Render the scene.
 
@@ -115,7 +114,7 @@ void View::paintGL()
 
     glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(p));
     glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(v));
-    glUniformMatrix4fv(m_uni["m"], 1, GL_FALSE, glm::value_ptr(glm::mat4()));
+    glUniformMatrix4fv(m_uni["m"], 1, GL_FALSE, glm::value_ptr(m));
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
