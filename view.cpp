@@ -4,7 +4,7 @@
 
 #include "lib/ResourceLoader.h"
 
-View::View(QWidget *parent) : QGLWidget(parent)
+View::View(QWidget *parent) : QGLWidget(parent), m_world(new World())
 {
     // View needs all mouse move events, not just mouse drag events
     setMouseTracking(true);
@@ -26,6 +26,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
 
 View::~View()
 {
+	m_world;
 }
 
 void View::initializeGL()
@@ -171,7 +172,7 @@ void View::tick()
     // Get the number of seconds since the last tick (variable update rate)
     float seconds = time.restart() * 0.001f;
 
-    // TODO: Implement the demo update here
+	m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();

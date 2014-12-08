@@ -1,17 +1,15 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef WATERSURFACE_H
+#define WATERSURFACE_H
 
 #include "entity.h"
 
-#define SPHERE_MASS (10)
-
-class Sphere : public Entity
+class WaterSurface : public Entity
 {
-friend class WaterSurface;
+friend class Sphere;
 
 public:
-	Sphere(glm::vec3 worldLocation, float radius);
-	virtual ~Sphere();
+	WaterSurface();
+	virtual ~WaterSurface();
 
 	Collision *collisionWith(Entity *other);
 
@@ -23,14 +21,6 @@ public:
 protected:
 	Collision *collisionWithSphere(Sphere *other);
 	Collision *collisionWithSurface(WaterSurface *other);
-
-	glm::vec3 m_center;
-	glm::vec3 m_velocity;
-	float m_radius;
-	float m_mass;
-
-	glm::vec3 impulsesThisTick;
-	glm::vec3 forcesThisTick;
 };
 
-#endif // SPHERE_H
+#endif // WATERSURFACE_H

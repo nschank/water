@@ -12,6 +12,13 @@ struct Collision
 
 	Entity *of;
 	Entity *with;
+
+	void react()
+	{
+		//Apply location change
+
+		//Apply impulse
+	}
 };
 
 #endif // COLLISION_H

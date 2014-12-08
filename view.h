@@ -14,13 +14,15 @@
 #include <string>
 #include <map>
 
+#include "world.h"
+
 class View : public QGLWidget
 {
     Q_OBJECT
 
 public:
     View(QWidget *parent);
-    ~View();
+	virtual ~View();
     CamtransCamera m_camera;
     GLuint m_shader;
     std::map<std::string, GLint> m_uni;
@@ -31,6 +33,8 @@ public:
 private:
     QTime time;
     QTimer timer;
+
+	World *m_world;
 
     void initializeGL();
     void paintGL();

@@ -19,7 +19,9 @@ SOURCES += main.cpp \
     OrbitingCamera.cpp \
     CamtransCamera.cpp \
     phys/entity.cpp \
-    phys/sphere.cpp
+    phys/sphere.cpp \
+    phys/world.cpp \
+    phys/watersurface.cpp
 
 HEADERS += mainwindow.h \
     view.h \
@@ -30,7 +32,9 @@ HEADERS += mainwindow.h \
     CamtransCamera.h \
     phys/entity.h \
     phys/collision.h \
-    phys/sphere.h
+    phys/sphere.h \
+    phys/world.h \
+    phys/watersurface.h
 
 FORMS += mainwindow.ui
 
