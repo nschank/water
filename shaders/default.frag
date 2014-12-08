@@ -3,9 +3,11 @@
 uniform float k_a, k_d;
 uniform vec3 O_a, O_d, i_a;
 
-varying vec3 pos;
-varying vec3 norm;
-varying vec3 l;
+in vec3 pos;
+in vec3 norm;
+
+const vec3 light = vec3(0.0f, 3.0f, 3.0f);
+
 
 void main()
 {

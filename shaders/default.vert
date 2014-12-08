@@ -9,15 +9,13 @@ uniform mat4 m;
 
 const vec3 light = vec3(0.0f, 3.0f, 3.0f);
 
-varying vec3 pos;
-varying vec3 norm;
-varying vec3 l;
+out vec3 pos;
+out vec3 norm;
 
 void main()
 {
   mat4 MVP = p * v * m;
   gl_Position = MVP * vec4(position, 1.0f);
-  pos = vec3(gl_Position);
-  norm = vec3(MVP * vec4(norm, 1.0f));
-  l = vec3(MVP * vec4(light, 1.0f));
+  pos = vec3(m * vec4(position, 1.0f));
+  norm = vec3(m * vec4(norm, 1.0f));
 }

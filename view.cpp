@@ -60,6 +60,8 @@ void View::initializeGL()
     m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
 
+    m_spheres_pos.push_back(glm::mat4x4(1.0));
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
