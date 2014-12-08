@@ -19,6 +19,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
+
 }
 
 View::~View()
@@ -55,15 +56,16 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_shader, 10);
-    //m_spheres_pos.push_back(glm::mat4x4(1.0));
     m_water = new WaterSurface(m_shader, 100);
     m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
 
     //m_spheres_pos.push_back(glm::mat4x4(1.0));
     //m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
-
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -89,6 +91,7 @@ void View::paintGL()
         fprintf(stderr, "(GL error code %d)\n", err);
     }
 
+    m = glm::translate(glm::vec3(-1.0/100, 0.0, 0.0))*m;
     // Update the scene camera.
     glViewport(0, 0, width(), height());
 
