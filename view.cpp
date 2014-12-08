@@ -19,7 +19,14 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
+    // ambient and diffuse coefficients
+    m_k_a = 0.2f;
+    m_k_d = 0.8f;
 
+    // set up coefficients and ambient intensity
+    m_O_a = glm::vec3( 1.0,  1.0, 1.0 );    // ambient sphere color -- each channel in [0,1]
+    m_O_d = glm::vec3( 1.0,  1.0, 1.0 );    // diffuse sphere color
+    m_i_a = glm::vec3( 0.25, 0.25, 0.25 ); // ambient light intensity
 }
 
 View::~View()
@@ -60,12 +67,9 @@ void View::initializeGL()
     m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-
-    //m_spheres_pos.push_back(glm::mat4x4(1.0));
-    //m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
+    m_spheres_pos.push_back(glm::mat4x4(1.0));
+    m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -102,6 +106,11 @@ void View::paintGL()
     glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->P()));
     glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->V()));
 
+    glUniform1f(glGetUniformLocation(m_shader, "k_a"), m_k_a);
+    glUniform1f(glGetUniformLocation(m_shader, "k_d"), m_k_d);
+    glUniform3fv(glGetUniformLocation(m_shader, "O_a"), 1, glm::value_ptr(m_O_a));
+    glUniform3fv(glGetUniformLocation(m_shader, "O_d"), 1, glm::value_ptr(m_O_d));
+    glUniform3fv(glGetUniformLocation(m_shader, "i_a"), 1, glm::value_ptr(m_i_a));
 
     // draw the m_spheres in their appropriate locations
     glBindVertexArray(m_sphere->m_vao);
@@ -109,12 +118,12 @@ void View::paintGL()
         m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
     glBindVertexArray(0);
 
-    m_water->ApplyImpulses();
+    /*m_water->ApplyImpulses();
     m_water->UpdateHeights();
     m_water->GenVertsFromHeight();
     glBindVertexArray(m_water->m_vao);
     m_water->Draw(m_water_transform, m_uni["m"]);
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 
     glUseProgram(0);
 

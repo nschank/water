@@ -37,6 +37,13 @@ private:
     QTime time;
     QTimer timer;
 
+    float m_k_a;
+    float m_k_d;
+
+    glm::vec3 m_O_a;
+    glm::vec3 m_O_d;
+    glm::vec3 m_i_a;
+
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
