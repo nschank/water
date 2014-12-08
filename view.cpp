@@ -56,7 +56,7 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_shader, 10);
-    m_water = new WaterSurface(m_shader, 200);
+    m_water = new WaterSurface(m_shader, 100);
     m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
 

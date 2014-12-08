@@ -76,6 +76,26 @@ void WaterSurface::UpdateHeights() {
     std::swap(m_h1, m_h2);
 }
 
+/*void WaterSurface::UpdateNormals() {
+    float top, left, right, bottom, center;
+    float cell_dist = 1.0/m_subdivs;
+    for (int i=1; i<m_subdivs; i++) {
+        for (j=1; j<m_subdivs; j++) {
+           center = m_h2[i*(m_subdivs+1) + j];
+           top = m_h2[(i-1)*(m_subdivs+1) + j];
+           bottom = m_h2[(i+1)*(m_subdivs+1) + j];
+           left = m_h2[i*(m_subdivs+1) + j-1];
+           right = m_h2[i*(m_subdivs+1) + j+1];
+
+           glm::vec3(-cell_dist)
+
+           m_normals[i*(m_subdivs+1) + j] =
+
+
+        }
+    }
+}*/
+
 void WaterSurface::ApplyImpulses() {
     for (int i=0; i<m_impulses.size(); i++) {
         glm::vec3 impulse = m_impulses.at(i);

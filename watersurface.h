@@ -16,6 +16,8 @@ public:
 
     void UpdateHeights();
 
+    //void UpdateNormals();
+
     void ApplyImpulses();
 
     void ApplyImpulseRadius(glm::vec3 impulse, float rad);
@@ -34,6 +36,8 @@ private:
     int m_total_verts, m_subdivs;
 
     float *m_h1, *m_h2;
+
+    glm::vec3 *m_normals;
 
 
 
