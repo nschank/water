@@ -13,17 +13,17 @@ SOURCES += main.cpp \
     mainwindow.cpp \
     view.cpp \
     lib/ResourceLoader.cpp \
-    watersurfacemodule.cpp \
-    OrbitingCamera.cpp \
-    CamtransCamera.cpp
+    sphere.cpp \
+    camera.cpp \
+    watersurface.cpp
 
 HEADERS += mainwindow.h \
     view.h \
     lib/ResourceLoader.h \
-    watersurfacemodule.h \
-    Camera.h \
-    OrbitingCamera.h \
-    CamtransCamera.h
+    sphere.h \
+    camera.h \
+    common.h \
+    watersurface.h
 
 FORMS += mainwindow.ui
 

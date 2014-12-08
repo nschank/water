@@ -19,13 +19,12 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    p = glm::perspective(55.0f, 1.0f, 0.01f, 10.0f);
-    v = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
 }
 
 View::~View()
 {
+    delete m_sphere;
+    delete m_camera;
 }
 
 void View::initializeGL()
@@ -43,7 +42,6 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
-    //m_camera.updateMatrices();
 
     m_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
@@ -54,32 +52,18 @@ void View::initializeGL()
     m_uni["v"] = glGetUniformLocation(m_shader, "v");
 
 
-    m_data = new float[3*3];
+    m_camera = new Camera(width(), height());
 
-    int inv = 1;
+    m_sphere = new Sphere(m_shader, 10);
+    //m_spheres_pos.push_back(glm::mat4x4(1.0));
+    m_water = new WaterSurface(m_shader, 100);
+    m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
-    m_data[0 + 6*inv] = 0; m_data[1 + 6*inv] = 0; m_data[2 + 6*inv] = 0;
-    m_data[3] = 1; m_data[4] = 0; m_data[5] = 0;
-    m_data[6 - 6*inv] = 1; m_data[7 - 6*inv] = 0; m_data[8 - 6*inv] = 1;
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
-    glGenBuffers(1, &m_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), m_data, GL_STATIC_DRAW);
+    //m_spheres_pos.push_back(glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
 
-    glEnableVertexAttribArray(glGetAttribLocation(m_shader, "position"));
-
-    glVertexAttribPointer(
-                glGetAttribLocation(m_shader, "position"),
-                3,
-                GL_FLOAT,
-                GL_FALSE,
-                sizeof(GLfloat)*3,
-                (void *)0
-                );
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -107,24 +91,32 @@ void View::paintGL()
 
     // Update the scene camera.
     glViewport(0, 0, width(), height());
-    m_camera.setAspectRatio((float)width() / (float)height());
 
     // Render the scene.
 
     glUseProgram(m_shader);
 
-    glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(p));
-    glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(v));
-    glUniformMatrix4fv(m_uni["m"], 1, GL_FALSE, glm::value_ptr(glm::mat4()));
+    glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->P()));
+    glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->V()));
 
-    glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // draw the m_spheres in their appropriate locations
+    glBindVertexArray(m_sphere->m_vao);
+    for (int i=0; i<m_spheres_pos.size(); i++)
+        m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
     glBindVertexArray(0);
 
+    m_water->ApplyImpulses();
+    m_water->UpdateHeights();
+    m_water->GenVertsFromHeight();
+    glBindVertexArray(m_water->m_vao);
+    m_water->Draw(m_water_transform, m_uni["m"]);
+    glBindVertexArray(0);
 
     glUseProgram(0);
 
 }
+
 
 void View::resizeGL(int w, int h)
 {
@@ -133,6 +125,9 @@ void View::resizeGL(int w, int h)
 
 void View::mousePressEvent(QMouseEvent *event)
 {
+    glm::vec3 hit;
+    if (m_camera->CastRayAtObject(&hit, m_water_transform))
+        m_water->AddImpulse(hit);
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
@@ -150,6 +145,18 @@ void View::mouseMoveEvent(QMouseEvent *event)
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 
     // TODO: Handle mouse movements here
+    m_camera->MouseMoved(deltaX, deltaY);
+    if (event->buttons() == Qt::LeftButton) {
+        glm::vec3 hit;
+        if (m_camera->CastRayAtObject(&hit, m_water_transform))
+            m_water->AddImpulse(hit);
+    }
+}
+
+void View::wheelEvent(QWheelEvent *event) {
+    int units = event->angleDelta().y();
+    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
+    m_camera->MouseScrolled(units);
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
