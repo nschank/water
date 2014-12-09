@@ -1,12 +1,7 @@
 #include "cubemap.h"
 #include <stdio.h>
 
-const char *CubeMap::topFilename = "clouds.jpg";
-const char *CubeMap::bottomFilename = "clouds.jpg";
-const char *CubeMap::leftFilename = "clouds.jpg";
-const char *CubeMap::rightFilename = "clouds.jpg";
-const char *CubeMap::frontFilename = "clouds.jpg";
-const char *CubeMap::backFilename = "clouds.jpg";
+const char *CubeMap::filename = "clouds.jpg";
 
 CubeMap::CubeMap(Camera* cam) {
   camera = cam;
@@ -26,89 +21,107 @@ CubeMap::CubeMap(Camera* cam) {
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  
-  loadSide(topFilename, GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
-  loadSide(bottomFilename, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
-  loadSide(leftFilename, GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
-  loadSide(rightFilename, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
-  loadSide(frontFilename, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
-  loadSide(backFilename, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
-  
-  
-  
 
-GLint vertex = glGetAttribLocation(cubeTexture, "vertex");
-glEnableVertexAttribArray(vertex);
-glVertexAttribPointer(vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  QImage textureFile = QImage(QString(filename));
+  if(textureFile.isNull()) {
+    return;
+  }
   
-  
-  
-GLfloat skyboxVertices[] = {
-  // Positions          
-  -1.0f,  1.0f, -1.0f,
-  -1.0f, -1.0f, -1.0f,
-   1.0f, -1.0f, -1.0f,
-   1.0f, -1.0f, -1.0f,
-   1.0f,  1.0f, -1.0f,
-  -1.0f,  1.0f, -1.0f,
+  uchar* bits = textureFile.bits();
+  int w = textureFile.width(),
+      h = textureFile.height();
 
-  -1.0f, -1.0f,  1.0f,
-  -1.0f, -1.0f, -1.0f,
-  -1.0f,  1.0f, -1.0f,
-  -1.0f,  1.0f, -1.0f,
-  -1.0f,  1.0f,  1.0f,
-  -1.0f, -1.0f,  1.0f,
+  /*loadSide(bits, w, w/4, w/2, 0, h/3, GL_TEXTURE_CUBE_MAP_POSITIVE_Y); // top
+  loadSide(bits, w, 0, w/4, h/3, 2*h/3, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); // bottom
+  loadSide(bits, w, w/4, w/2, h/3, 2*h/3, GL_TEXTURE_CUBE_MAP_NEGATIVE_X); // left
+  loadSide(bits, w, w/2, 3*w/4, h/3, 2*h/3, GL_TEXTURE_CUBE_MAP_POSITIVE_X); // right
+  loadSide(bits, w, 3*w/4, w, h/3, 2*h/3, GL_TEXTURE_CUBE_MAP_POSITIVE_Z); // back
+  loadSide(bits, w, w/4, w/2, 2*h/3, h, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z); // front*/
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_POSITIVE_Y); // top
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y); // bottom
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_NEGATIVE_X); // left
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_POSITIVE_X); // right
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_POSITIVE_Z); // back
+  loadSide(bits, w, 0, w, 0, h, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z); // front
 
-   1.0f, -1.0f, -1.0f,
-   1.0f, -1.0f,  1.0f,
-   1.0f,  1.0f,  1.0f,
-   1.0f,  1.0f,  1.0f,
-   1.0f,  1.0f, -1.0f,
-   1.0f, -1.0f, -1.0f,
+  GLint vertex = glGetAttribLocation(cubeTexture, "vertex");
+  glEnableVertexAttribArray(vertex);
+  glVertexAttribPointer(vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  -1.0f, -1.0f,  1.0f,
-  -1.0f,  1.0f,  1.0f,
-   1.0f,  1.0f,  1.0f,
-   1.0f,  1.0f,  1.0f,
-   1.0f, -1.0f,  1.0f,
-  -1.0f, -1.0f,  1.0f,
 
-  -1.0f,  1.0f, -1.0f,
-   1.0f,  1.0f, -1.0f,
-   1.0f,  1.0f,  1.0f,
-   1.0f,  1.0f,  1.0f,
-  -1.0f,  1.0f,  1.0f,
-  -1.0f,  1.0f, -1.0f,
 
-  -1.0f, -1.0f, -1.0f,
-  -1.0f, -1.0f,  1.0f,
-   1.0f, -1.0f, -1.0f,
-   1.0f, -1.0f, -1.0f,
-  -1.0f, -1.0f,  1.0f,
-   1.0f, -1.0f,  1.0f
-};
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glBindVertexArray(0);
+  GLfloat skyboxVertices[] = {
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
+  };
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(1, &vbo);
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+  glBindVertexArray(0);
 }
 
 CubeMap::~CubeMap() {
-  glDeleteTextures(1, &cubeTexture);
+  //glDeleteTextures(1, &cubeTexture);
 }
 
-void CubeMap::loadSide(const char* filename, GLenum side) {
-  QImage textureFile = QImage(QString(filename));
-  if(!textureFile.isNull()) {
-    uchar* bits = textureFile.bits();
-    int w = textureFile.width(),
-        h = textureFile.height();
-    glTexImage2D(side, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
+void CubeMap::loadSide(uchar* bits, int width, int startX, int endX, int startY, int endY, GLenum side) {
+  int sideWidth = endX - startX,
+      sideHeight = endY - startY;
+  uchar *sideBits = new uchar[sideWidth*sideHeight];
+  for(int y=startY; y<endY; y++) {
+    for(int x=startX; x<endX; x++) {
+      int bitsIndex = x + y*width;
+      int sideIndex = x - startX + sideWidth*(y - startY);
+     // printf("bitsIndex %d, sideIndex %d, sideWidth*sideHeight %d\n", bitsIndex, sideIndex, sideWidth*sideHeight);
+      sideBits[sideIndex] = bits[bitsIndex];
+    }
   }
+  printf("W %d, h %d\n", sideWidth, sideHeight);
+  glTexImage2D(side, 0, GL_RGBA, sideWidth, sideHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, sideBits);
+  //delete[] sideBits;
 }
 
 void CubeMap::draw() {
