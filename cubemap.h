@@ -18,12 +18,50 @@ public:
 
 private:
   Camera* camera;
-  void loadSide(uchar* bits, int width, int startX, int endX, int startY, int endY, GLenum side);
+  void loadSide(const char* filename, GLenum side);
   GLuint cubemapShader, vao, vbo, cubeTexture;
   int VertexCount;
   void GenVerts(int res);
   float *vertexData;
-  static const char *filename;
+
+  static const char *topFilename,
+                    *bottomFilename,
+                    *leftFilename,
+                    *rightFilename,
+                    *frontFilename,
+                    *backFilename;
+
+  /*GLfloat mapPoints[108] = {
+    // top
+    S, S, S, 0.0f, 0.0f,
+    -S, S, -S, 0.0f, 0.0f,
+    -S, S, S, 0.0f, 0.0f,
+
+    S, S, -S, 0.0f, 0.0f,
+    S, S, S, 0.0f, 0.0f,
+    -S, S, S, 0.0f, 0.0f,
+
+    // bottom
+    S, S, -S, 0.0f, 0.0f,
+    -S, S, S, 0.0f, 0.0f,
+    -S, S, -S, 0.0f, 0.0f,
+
+    S, S, -S, 0.0f, 0.0f,
+    S, S, S, 0.0f, 0.0f,
+    -S, S, -S, 0.0f, 0.0f,
+
+    // left
+
+
+    // right
+
+
+    // front
+
+
+    // back
+
+  };*/
 };
 
 #endif // CUBEMAP_H
