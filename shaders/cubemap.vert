@@ -1,13 +1,14 @@
 #version 330 core
 
-in vec3 position;
-in vec2 texCoord;
+layout (location = 0) in vec3 position;
+out vec3 TexCoords;
 
-out vec2 uv;
+uniform mat4 projection;
+uniform mat4 view;
 
-uniform mat4 mvp;
 
-void main () {
-  uv = texCoord;
-  gl_Position = mvp * vec4(position, 1.0);
-}
+void main()
+{
+    gl_Position =   projection * view * vec4(position, 1.0);  
+    TexCoords = position;
+}  

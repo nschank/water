@@ -55,7 +55,7 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-
+CubeMap* cubeMap;
 
 
 private slots:

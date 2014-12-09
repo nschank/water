@@ -5,20 +5,21 @@
 
 #include <QImage>
 
+#include "camera.h"
 #include "GL/glew.h"
 #include "lib/ResourceLoader.h"
 
 class CubeMap
 {
 public:
-  CubeMap(Camera *cam);
+  CubeMap(Camera* cam);
   virtual ~CubeMap();
-  void Draw();
+  void draw();
 
 private:
-  Camera camera;
+  Camera* camera;
   void loadSide(const char* filename, GLenum side);
-  GLuint shader, vao, vbo, cubeTexture;
+  GLuint cubemapShader, vao, vbo, cubeTexture;
   int VertexCount;
   void GenVerts(int res);
   float *vertexData;
@@ -30,9 +31,7 @@ private:
                     *frontFilename,
                     *backFilename;
 
-  int size = 108;
-
-  GLfloat mapPoints[size] = {
+  /*GLfloat mapPoints[108] = {
     // top
     S, S, S, 0.0f, 0.0f,
     -S, S, -S, 0.0f, 0.0f,
@@ -62,7 +61,7 @@ private:
 
     // back
 
-  };
+  };*/
 };
 
 #endif // CUBEMAP_H
