@@ -21,8 +21,6 @@ GLuint ResourceLoader::loadShaders(const char * vertex_file_path,const char * fr
         VertexShaderCode = vertStream.readAll().toStdString();
     }
 
-    printf("---%s---\n", VertexShaderCode.c_str());
-
     // Read fragment shader code from file
     std::string FragmentShaderCode;
     QString fragFilePath = QString(fragment_file_path);

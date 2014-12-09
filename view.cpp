@@ -22,11 +22,18 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // ambient and diffuse coefficients
     m_k_a = 0.2f;
     m_k_d = 0.8f;
+    // ambient intensity
+    m_i_a = glm::vec3(0.25, 0.25, 0.25);
 
-    // set up coefficients and ambient intensity
-    m_O_a = glm::vec3( 1.0,  1.0, 1.0 );    // ambient sphere color -- each channel in [0,1]
-    m_O_d = glm::vec3( 1.0,  1.0, 1.0 );    // diffuse sphere color
-    m_i_a = glm::vec3( 0.25, 0.25, 0.25 ); // ambient light intensity
+    // object ambient color
+    m_object_a = glm::vec3(1.0, 0.6, 0.6);
+    // object diffuse color
+    m_object_d = glm::vec3(1.0, 0.2, 0.2);
+
+    // water ambient and diffuse colors
+    m_water_a = glm::vec3(0.0, 0.8, 1.0);
+    // object diffuse color
+    m_water_d = glm::vec3(0.0, 0.6, 1.0);
 }
 
 View::~View()
@@ -51,25 +58,29 @@ void View::initializeGL()
     }
 
 
-    m_shader = ResourceLoader::loadShaders(
+    m_object_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
             "shaders/default.frag");
 
-    m_uni["p"] = glGetUniformLocation(m_shader, "p");
-    m_uni["m"] = glGetUniformLocation(m_shader, "m");
-    m_uni["v"] = glGetUniformLocation(m_shader, "v");
+    m_water_shader = ResourceLoader::loadShaders(
+            "shaders/water.vert",
+            "shaders/water.frag");
+
+    m_uni["p"] = glGetUniformLocation(m_object_shader, "p");
+    m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
+    m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
 
 
     m_camera = new Camera(width(), height());
 
-    m_sphere = new Sphere(m_shader, 10);
-    m_water = new WaterSurface(m_shader, 200);
+    m_sphere = new Sphere(m_object_shader, 30);
+    m_water = new WaterSurface(m_water_shader, 200);
     m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
 
 
 
-    m_spheres_pos.push_back(glm::mat4x4(1.0));
-    m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -82,6 +93,9 @@ void View::initializeGL()
     // events. This occurs if there are two monitors and the mouse is on the
     // secondary monitor.
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
+
+    CubeMap cubeMap;
+    cubeMap.Draw();
 }
 
 void View::paintGL()
@@ -101,22 +115,34 @@ void View::paintGL()
 
     // Render the scene.
 
-    glUseProgram(m_shader);
+    glUseProgram(m_object_shader);
 
     glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->P()));
     glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->V()));
 
-    glUniform1f(glGetUniformLocation(m_shader, "k_a"), m_k_a);
-    glUniform1f(glGetUniformLocation(m_shader, "k_d"), m_k_d);
-    glUniform3fv(glGetUniformLocation(m_shader, "O_a"), 1, glm::value_ptr(m_O_a));
-    glUniform3fv(glGetUniformLocation(m_shader, "O_d"), 1, glm::value_ptr(m_O_d));
-    glUniform3fv(glGetUniformLocation(m_shader, "i_a"), 1, glm::value_ptr(m_i_a));
+    glUniform1f(glGetUniformLocation(m_object_shader, "k_a"), m_k_a);
+    glUniform1f(glGetUniformLocation(m_object_shader, "k_d"), m_k_d);
+    glUniform3fv(glGetUniformLocation(m_object_shader, "object_a"), 1, glm::value_ptr(m_object_a));
+    glUniform3fv(glGetUniformLocation(m_object_shader, "object_d"), 1, glm::value_ptr(m_object_d));
+    glUniform3fv(glGetUniformLocation(m_object_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));
 
     // draw the m_spheres in their appropriate locations
     glBindVertexArray(m_sphere->m_vao);
-    for (int i=0; i<m_spheres_pos.size(); i++)
-        m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
+    for (int i=0; i<m_spheres_pos.size(); i++) {
+      glm::mat3 normal_matrix = glm::mat3x3(glm::transpose(glm::inverse(m_spheres_pos.at(i))));
+      glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal_matrix));
+      m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
+    }
     glBindVertexArray(0);
+    glUseProgram(0);
+
+
+    glUseProgram(m_water_shader);
+    glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
+    glUniform1f(glGetUniformLocation(m_water_shader, "k_d"), m_k_d);
+    glUniform3fv(glGetUniformLocation(m_water_shader, "object_a"), 1, glm::value_ptr(m_water_a));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "object_d"), 1, glm::value_ptr(m_water_d));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));
 
     /*m_water->ApplyImpulses();
     m_water->UpdateHeights();
@@ -124,9 +150,7 @@ void View::paintGL()
     glBindVertexArray(m_water->m_vao);
     m_water->Draw(m_water_transform, m_uni["m"]);
     glBindVertexArray(0);*/
-
     glUseProgram(0);
-
 }
 
 

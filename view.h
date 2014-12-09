@@ -1,10 +1,11 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "common.h"
 
-#include "sphere.h"
 #include "camera.h"
+#include "common.h"
+#include "cubemap.h"
+#include "sphere.h"
 #include "watersurface.h"
 
 #include <QTime>
@@ -20,7 +21,7 @@ public:
     View(QWidget *parent);
     ~View();
 
-    GLuint m_shader;
+    GLuint m_object_shader, m_water_shader;
     std::map<std::string, GLint> m_uni;
     std::vector<glm::mat4x4> m_spheres_pos;
     Sphere *m_sphere;
@@ -40,9 +41,8 @@ private:
     float m_k_a;
     float m_k_d;
 
-    glm::vec3 m_O_a;
-    glm::vec3 m_O_d;
-    glm::vec3 m_i_a;
+    glm::vec3 m_object_a, m_object_d, m_i_a,
+              m_water_a, m_water_d;
 
     void initializeGL();
     void paintGL();

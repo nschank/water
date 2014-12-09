@@ -15,7 +15,8 @@ SOURCES += main.cpp \
     lib/ResourceLoader.cpp \
     sphere.cpp \
     camera.cpp \
-    watersurface.cpp
+    watersurface.cpp \
+    cubemap.cpp
 
 HEADERS += mainwindow.h \
     view.h \
@@ -23,7 +24,8 @@ HEADERS += mainwindow.h \
     sphere.h \
     camera.h \
     common.h \
-    watersurface.h
+    watersurface.h \
+    cubemap.h
 
 FORMS += mainwindow.ui
 
@@ -33,4 +35,8 @@ DEPENDPATH += /course/cs123/lib/glew/glew-1.10.0/include
 
 OTHER_FILES += \
     shaders/default.frag \
-    shaders/default.vert
+    shaders/default.vert \
+    shaders/water.frag \
+    shaders/water.vert \
+    shaders/cubemap.frag \
+    shaders/cubemap.vert
