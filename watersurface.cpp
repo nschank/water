@@ -244,12 +244,12 @@ float WaterSurface::heightAt(float x, float y)
 
 float WaterSurface::getXResolution()
 {
-	return .001;
+	return 1/float(m_subdivs);
 }
 
 float WaterSurface::getYResolution()
 {
-	return .001;
+	return 1/float(m_subdivs);
 }
 
 float WaterSurface::getMaxHeight()

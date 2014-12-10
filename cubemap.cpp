@@ -1,12 +1,12 @@
 #include "cubemap.h"
 #include <stdio.h>
 
-const char *CubeMap::topFilename = "top.png";
-const char *CubeMap::bottomFilename = "bottom.png";
-const char *CubeMap::leftFilename = "left.png";
-const char *CubeMap::rightFilename = "right.png";
-const char *CubeMap::frontFilename = "front.png";
-const char *CubeMap::backFilename = "back.png";
+const char *CubeMap::topFilename = "top.jpg";
+const char *CubeMap::bottomFilename = "bottom.jpg";
+const char *CubeMap::leftFilename = "left.jpg";
+const char *CubeMap::rightFilename = "right.jpg";
+const char *CubeMap::frontFilename = "front.jpg";
+const char *CubeMap::backFilename = "back.jpg";
 
 CubeMap::CubeMap(Camera* cam) {
   camera = cam;

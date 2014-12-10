@@ -41,8 +41,6 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
-	addSphere(glm::vec3(.2,.2,.2), .02, glm::vec3(-.1,-.1,-.1));
-	addSphere(glm::vec3(.1,.1,.1), .02, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -94,7 +92,7 @@ void View::initializeGL()
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//glEnable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual

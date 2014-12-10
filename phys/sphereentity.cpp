@@ -1,4 +1,4 @@
-#include "SphereEntity.h"
+#include "sphereentity.h"
 #include "watersurface.h"
 #include <stdio.h>
 #include <iostream>
