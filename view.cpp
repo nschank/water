@@ -78,10 +78,10 @@ void View::initializeGL()
     m_water = new WaterSurface(m_water_shader, 100);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
-//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    m_spheres_pos.push_back(glm::mat4x4(1.0));
-    m_spheres_pos.push_back(glm::translate(glm::vec3(0.5f, 0.0f, 0.0f))*glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::translate(glm::vec3(0.5f, 0.0f, 0.0f))*glm::mat4x4(1.0));
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -96,7 +96,6 @@ void View::initializeGL()
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 
     cubeMap = new CubeMap(m_camera);
-    cubeMap->draw();
 }
 
 void View::paintGL()
@@ -116,7 +115,7 @@ void View::paintGL()
 
     // Render the scene.
 
-    cubeMap->draw();
+    //cubeMap->draw();
 
     glUseProgram(m_object_shader);
 
@@ -149,7 +148,7 @@ void View::paintGL()
     glUseProgram(0);
     
     
-    /*glUseProgram(m_water_shader);
+    glUseProgram(m_water_shader);
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->P()));
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->V()));
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
@@ -159,7 +158,7 @@ void View::paintGL()
     glBindVertexArray(m_water->m_vao);
     m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
     glBindVertexArray(0);
-    glUseProgram(0);*/
+    glUseProgram(0);
 }
 
 
