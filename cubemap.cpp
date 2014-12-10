@@ -110,6 +110,7 @@ void CubeMap::loadSide(const char* filename, GLenum side) {
 }
 
 void CubeMap::draw() {
+  glDisable(GL_DEPTH_TEST);
   glDepthMask(GL_FALSE);
   glUseProgram(cubemapShader);
   glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "view"), 1, GL_FALSE, glm::value_ptr(camera->getViewMatrix()));
@@ -121,4 +122,5 @@ void CubeMap::draw() {
   glDrawArrays(GL_TRIANGLES, 0, 36);
   glBindVertexArray(0);
   glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
 }

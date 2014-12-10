@@ -69,6 +69,8 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
+    glEnable(GL_DEPTH_TEST);
+
 
     m_object_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
@@ -90,6 +92,12 @@ void View::initializeGL()
     m_water = new WaterSurface(m_water_shader, 100);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
+
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    std::vector<glm::mat3> normal_matrices;
+    //m_spheres_pos.push_back(glm::mat4x4(1.0));
+    //m_spheres_pos.push_back(glm::translate(glm::vec3(2.0f, 0.0f, 0.0f))*glm::scale(glm::vec3(2.0, 2.0, 2.0))*glm::mat4x4(1.0));
+
 
 	//glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -141,6 +149,7 @@ void View::paintGL()
 
     // draw the m_spheres in their appropriate locations
     glBindVertexArray(m_sphere->m_vao);
+
 	for(int i=0; i < m_sphere_entities.size(); i++) {
 		SphereEntity *current = m_sphere_entities.at(i);
 		glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
@@ -148,6 +157,7 @@ void View::paintGL()
     }
     glBindVertexArray(0);
     //glUseProgram(0);
+
 
 	/*glUseProgram(m_water_shader);
 	glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
