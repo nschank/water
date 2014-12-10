@@ -4,6 +4,7 @@
 SphereEntity::SphereEntity(glm::vec3 worldLocation, float radius) :
 	m_center(worldLocation), m_radius(radius), m_mass(SphereEntity_MASS), m_cor(SphereEntity_COR)
 {
+	this->updateMatrices();
 }
 
 
@@ -102,4 +103,20 @@ void SphereEntity::tick(float secondsSinceLastTick)
 	forcesThisTick = glm::vec3();
 
 	m_center += (m_velocity * secondsSinceLastTick);
+}
+
+glm::mat4 SphereEntity::modelMatrix()
+{
+	return m_modelMatrix;
+}
+
+glm::mat3 SphereEntity::normalMatrix()
+{
+	return m_normalMatrix;
+}
+
+void SphereEntity::updateMatrices()
+{
+	m_modelMatrix = glm::translate(glm::mat4(), m_center)*glm::scale(glm::mat4(), glm::vec3(m_radius));
+	m_normalMatrix = glm::mat3x3(glm::transpose(glm::inverse(m_modelMatrix)));
 }

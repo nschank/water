@@ -3,7 +3,7 @@ QT += core gui opengl
 TARGET = final
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -g
+QMAKE_CXXFLAGS += -g -w
 
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
 INCLUDEPATH += glm lib phys

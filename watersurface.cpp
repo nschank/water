@@ -197,7 +197,8 @@ void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
 
 void WaterSurface::tick(float secondsSinceLastTick)
 {
-
+	ApplyImpulses();
+	UpdateHeights();
 }
 
 void WaterSurface::collideWith(Entity *other)

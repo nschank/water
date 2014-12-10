@@ -21,9 +21,13 @@ public:
 	void applyForceAt(glm::vec3 force, glm::vec3 location);
 	void tick(float secondsSinceLastTick);
 
+	glm::mat3 normalMatrix();
+	glm::mat4 modelMatrix();
+
 protected:
 	void collideWithSphere(SphereEntity *other);
 	void collideWithSurface(WaterSurface *other);
+	void updateMatrices();
 
 	glm::vec3 m_center;
 	glm::vec3 m_velocity;
@@ -33,6 +37,9 @@ protected:
 
 	glm::vec3 impulsesThisTick;
 	glm::vec3 forcesThisTick;
+
+	glm::mat3 m_normalMatrix;
+	glm::mat4 m_modelMatrix;
 };
 
 #endif // SphereEntity_H

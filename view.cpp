@@ -3,6 +3,9 @@
 #include <QKeyEvent>
 
 #include "lib/ResourceLoader.h"
+#include "sphereentity.h"
+
+#define GRAVITY (glm::vec3(0,-9.8,0))
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -34,6 +37,9 @@ View::View(QWidget *parent) : QGLWidget(parent)
     m_water_a = glm::vec3(0.0, 0.8, 1.0);
     // object diffuse color
     m_water_d = glm::vec3(0.0, 0.6, 1.0);
+
+	//create a World for Entities to live in
+	m_world = new World();
 }
 
 View::~View()
@@ -41,6 +47,7 @@ View::~View()
     delete m_sphere;
     delete m_camera;
     delete cubeMap;
+	delete m_world;
 }
 
 void View::initializeGL()
@@ -76,6 +83,7 @@ void View::initializeGL()
 
     m_sphere = new Sphere(m_object_shader, 30);
     m_water = new WaterSurface(m_water_shader, 100);
+	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -130,10 +138,10 @@ void View::paintGL()
 
     // draw the m_spheres in their appropriate locations
     glBindVertexArray(m_sphere->m_vao);
-    for (int i=0; i<m_spheres_pos.size(); i++) {
-      glm::mat3 normal_matrix = glm::mat3x3(glm::transpose(glm::inverse(m_spheres_pos.at(i))));
-      glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal_matrix));
-      m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
+	for(int i=0; i < m_sphere_entities.size(); i++) {
+		SphereEntity *current = m_sphere_entities.at(i);
+		glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
+		m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
     }
     glBindVertexArray(0);
     //glUseProgram(0);
@@ -152,8 +160,6 @@ void View::paintGL()
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->P()));
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->V()));
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
-    m_water->ApplyImpulses();
-    m_water->UpdateHeights();
     m_water->GenVertsFromHeight();
     glBindVertexArray(m_water->m_vao);
     m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
@@ -223,7 +229,11 @@ void View::tick()
     // Get the number of seconds since the last tick (variable update rate)
     float seconds = time.restart() * 0.001f;
 
+	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
+		(*it)->applyForceAt(GRAVITY, glm::vec3());
+
     // TODO: Implement the demo update here
+	m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
