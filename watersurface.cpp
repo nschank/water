@@ -109,9 +109,13 @@ void WaterSurface::ApplyImpulses() {
     for (int i=0; i<m_impulses.size(); i++) {
         glm::vec3 impulse = m_impulses.at(i);
         int closest_x, closest_y;
-        closest_x = glm::max(0, glm::min(m_subdivs, int(((impulse.x + 0.5) / 1.0)*m_subdivs)));
-        closest_y = glm::max(0, glm::min(m_subdivs, int(((impulse.z + 0.5) / 1.0)*m_subdivs)));
+		closest_x = glm::max(1, glm::min(m_subdivs-1, int(((impulse.x + 0.5) / 1.0)*m_subdivs)));
+		closest_y = glm::max(1, glm::min(m_subdivs-1, int(((impulse.z + 0.5) / 1.0)*m_subdivs)));
         m_vel[closest_y*(m_subdivs + 1) + closest_x] += impulse.y;
+		m_vel[(closest_y+1)*(m_subdivs + 1) + (closest_x+1)] += impulse.y/2.f;
+		m_vel[(closest_y+1)*(m_subdivs + 1) + (closest_x-1)] += impulse.y/2.f;
+		m_vel[(closest_y-1)*(m_subdivs + 1) + (closest_x+1)] += impulse.y/2.f;
+		m_vel[(closest_y-1)*(m_subdivs + 1) + (closest_x-1)] += impulse.y/2.f;
     }
     m_impulses.clear();
 }
@@ -127,8 +131,6 @@ void WaterSurface::ApplyImpulseRadius(glm::vec3 impulse, float rad) {
         min_y = glm::max(0, glm::min(m_subdivs, int(closest_y - rad))),
         max_y = glm::max(0, glm::min(m_subdivs, int(closest_y + rad)));
 
-
-
     for (int i=min_y; i<=max_y; i++) {
         for (int j=min_x; j<=max_x; j++) {
             m_vel[i*(m_subdivs+1) + j] = glm::min(m_vel[i*(m_subdivs+1)+j] + 0.5, 0.5);
@@ -137,7 +139,7 @@ void WaterSurface::ApplyImpulseRadius(glm::vec3 impulse, float rad) {
 }
 
 void WaterSurface::AddImpulse(glm::vec3 impulse) {
-    m_impulses.push_back(impulse);
+
 }
 
 
@@ -227,9 +229,8 @@ void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
 
 void WaterSurface::tick(float secondsSinceLastTick)
 {
-    ApplyImpulses();
+	ApplyImpulses();
 	UpdateHeights();
-
 }
 
 void WaterSurface::collideWith(Entity *other)
@@ -250,7 +251,9 @@ void WaterSurface::collideWithSurface(WaterSurface *other)
 
 float WaterSurface::heightAt(float x, float y)
 {
-	return 0;
+	int closest_x = glm::max(0, glm::min(m_subdivs, int(((x + 0.5) / 1.0)*m_subdivs)));
+	int closest_y = glm::max(0, glm::min(m_subdivs, int(((y + 0.5) / 1.0)*m_subdivs)));
+	return m_height[closest_y*(m_subdivs+1) + closest_x];
 }
 
 float WaterSurface::getXResolution()

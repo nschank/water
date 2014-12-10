@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <iostream>
 
+#define FPS (60)
+#define MAX_MASS (100)
+
 SphereEntity::SphereEntity(glm::vec3 worldLocation, float radius) :
 	m_center(worldLocation), m_radius(radius), m_mass(SphereEntity_MASS), m_cor(SphereEntity_COR)
 {
@@ -53,34 +56,47 @@ void SphereEntity::collideWithSphere(SphereEntity *other)
 
 void SphereEntity::collideWithSurface(WaterSurface *surface)
 {
-	/*if(m_center.z - m_radius > surface->getMaxHeight()) //ball is too high up
+	if(m_center.y - m_radius > surface->getMaxHeight()) //ball is too high up
 		return;
 
-	/*float collisionWeight = 0;
-	glm::vec3 impulsePosition;
+	//the number of points necessary to hold up this ball precisely
+	const float buoyancy = (.5f*m_mass/MAX_MASS + .5f) * M_PI * m_radius * m_radius / surface->getXResolution() / surface->getYResolution();
 
-	const float max_x = surface->getXResolution()*m_radius + m_center.x;
-	const float max_y = surface->getYResolution()*m_radius + m_center.y;
-	const float radius2 = m_radius*m_radius;
+	const float max_x = glm::min(.5f,m_radius + m_center.x+surface->getXResolution());
+	const float max_z = glm::min(.5f,m_radius + m_center.z+surface->getYResolution());
 
-	for(float x = m_center.x - surface->getXResolution()*m_radius; x < max_x; x += surface->getXResolution())
+	int supportingPoints = 0;
+	glm::vec3 supportingVector;
+
+	//x2+y2+z2=r2
+	for(float x = glm::max(-.5f,m_center.x - m_radius); x <= max_x; x += surface->getXResolution())
 	{
 		const float x_dist = (x - m_center.x)*(x - m_center.x);
-		for(float y = m_center.y - surface->getYResolution()*m_radius; y < max_y; y += surface->getYResolution())
+		for(float z = glm::max(-.5f,m_center.z - m_radius); z <= max_z; z += surface->getYResolution())
 		{
-			float z = surface->heightAt(x,y);
-			float yz_dist = (y - m_center.y)*(y - m_center.y) + (z - m_center.z)*(z - m_center.z);
+			float y = surface->heightAt(x,z);
+			float y_dist = (y - m_center.y)*(y - m_center.y);
+			float z_dist = (z - m_center.z)*(z - m_center.z);
 
-			if(x_dist + yz_dist > radius2)
+			float distance = glm::sqrt(x_dist + y_dist + z_dist);
+			if(distance > m_radius)
+				continue;
 
+			float ball_y = glm::sqrt(m_radius*m_radius - x_dist - y_dist) + m_center.y;
 
+			supportingPoints++;
+			supportingVector += glm::vec3(x,ball_y,z) - m_center;
+			surface->applyImpulseAt(glm::vec3(0,ball_y-y+.001,0), glm::vec3(x,0,z));
 		}
-	}*/
+	}
 
-	if(m_center.y > m_radius) return;
+	if(supportingPoints > 0)
+	{
+		supportingVector /= supportingVector.y;
 
-	applyImpulseAt(glm::vec3(0,-m_velocity.y*(1+m_cor)*m_mass,0),m_center);
-	m_center.y = m_radius;
+		this->applyTranslationAt(glm::vec3(0,.001,0), m_center);
+		this->applyImpulseAt(-m_velocity.y * m_mass * float(supportingPoints)/buoyancy * supportingVector, m_center);
+	}
 }
 
 void SphereEntity::applyTranslationAt(glm::vec3 translation, glm::vec3 location)

@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-#define SphereEntity_MASS (10)
+#define SphereEntity_MASS (90)
 #define SphereEntity_COR (.2)
 
 class SphereEntity : public Entity

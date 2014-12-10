@@ -90,14 +90,14 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_object_shader, 30);
-    m_water = new WaterSurface(m_water_shader, 100);
+	m_water = new WaterSurface(m_water_shader, 100);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
     std::vector<glm::mat3> normal_matrices;
 
 	//glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
@@ -207,7 +207,7 @@ void View::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() == Qt::LeftButton) {
         glm::vec3 hit;
         if (m_camera->CastRayAtObject(&hit, m_water_transform))
-            m_water->AddImpulse(hit);
+			m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
     }
 }
 
