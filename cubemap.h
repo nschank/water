@@ -20,6 +20,7 @@ public:
   CubeMap(Camera* cam);
   virtual ~CubeMap();
   void draw();
+  void setShaderSamplerCube(GLuint otherShader, char *propertyName);
 
 private:
   Camera* camera;

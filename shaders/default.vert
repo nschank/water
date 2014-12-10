@@ -9,14 +9,16 @@ uniform mat4 v;
 uniform mat4 m;
 
 out vec3 pos;
-out vec3 nnorm;
-out vec4 pos4;
+out vec3 norm;
+out mat4 view;
+out vec3 vertexToEye;
 
 void main()
 {
   mat4 MVP = p * v * m;
   gl_Position = MVP * vec4(position, 1.0f);
   pos = vec3(m * vec4(position, 1.0f));
-  pos4 = v * m * vec4(position, 1.0f);
-  nnorm = normalize(normal_matrix * normal);
+  norm = normalize(normal_matrix * normalize(normal));
+  view = v;
+  vertexToEye = -normalize(pos);
 }
