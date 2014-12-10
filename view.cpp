@@ -188,7 +188,7 @@ void View::mousePressEvent(QMouseEvent *event)
 {
     glm::vec3 hit;
     if (m_camera->CastRayAtObject(&hit, m_water_transform))
-        m_water->AddImpulse(hit);
+        m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
