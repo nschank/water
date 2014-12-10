@@ -6,8 +6,13 @@
 #include <QImage>
 
 #include "camera.h"
-#include "GL/glew.h"
 #include "lib/ResourceLoader.h"
+
+#ifndef __AT_HOME__
+#include "GL/glew.h"
+#else
+#include "glew.h"
+#endif
 
 class CubeMap
 {

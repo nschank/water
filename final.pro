@@ -29,10 +29,6 @@ HEADERS += mainwindow.h \
 
 FORMS += mainwindow.ui
 
-LIBS += -L/course/cs123/lib/glew/glew-1.10.0/include -lGLEW
-INCLUDEPATH += /course/cs123/lib/glew/glew-1.10.0/include
-DEPENDPATH += /course/cs123/lib/glew/glew-1.10.0/include
-
 OTHER_FILES += \
     shaders/default.frag \
     shaders/default.vert \
@@ -40,3 +36,16 @@ OTHER_FILES += \
     shaders/water.vert \
     shaders/cubemap.frag \
     shaders/cubemap.vert
+
+#####SUNLAB##########
+#LIBS += -L/course/cs123/lib/glew/glew-1.10.0/include -lGLEW
+#INCLUDEPATH += /course/cs123/lib/glew/glew-1.10.0/include
+#DEPENDPATH += /course/cs123/lib/glew/glew-1.10.0/include
+
+#######WINDOWS#######
+INCLUDEPATH += glew
+DEPENDPATH += glew
+DEFINES += GLEW_STATIC __AT_HOME__
+HEADERS += glew/glew.h glew/wglew.h
+SOURCES += glew/glew.c
+
