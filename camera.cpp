@@ -59,7 +59,7 @@ void Camera::MouseMoved(int dx, int dy) {
                             glm::translate(-m_eye);
     m_eye = glm::vec3(transform * glm::vec4(m_eye, 1.0));
     m_target = glm::vec3(transform * glm::vec4(m_target, 1.0));
-    m_up = glm::vec3(transform * glm::vec4(m_up, 1.0));
+    m_up = glm::vec3(transform * glm::vec4(m_up, 0.0));
 
     m_v = glm::lookAt(m_eye, m_target, m_up);
 
@@ -72,6 +72,6 @@ void Camera::MouseScrolled(int units) {
     glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
     m_eye = glm::vec3(transform * glm::vec4(m_eye, 1.0));
     m_target = glm::vec3(transform * glm::vec4(m_target, 1.0));
-    m_up = glm::vec3(transform * glm::vec4(m_up, 1.0));
+    m_up = glm::vec3(transform * glm::vec4(m_up, 0.0));
 
 }

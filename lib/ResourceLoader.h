@@ -1,7 +1,11 @@
 #ifndef RESOURCELOADER_H
 #define RESOURCELOADER_H
 
+#ifndef __AT_HOME__
 #include "GL/glew.h"
+#else
+#include "glew.h"
+#endif
 
 class ResourceLoader
 {

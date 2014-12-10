@@ -11,7 +11,7 @@ public:
 
     void Draw(glm::mat4x4 mat, GLuint model);
 
-    GLuint m_shader, m_vao, m_vbo;
+    GLuint m_object_shader, m_vao, m_vbo;
 
     float *m_verts;
 
