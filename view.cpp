@@ -3,6 +3,9 @@
 #include <QKeyEvent>
 
 #include "lib/ResourceLoader.h"
+#include "sphereentity.h"
+
+#define GRAVITY (glm::vec3(0,0,0))
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -34,6 +37,12 @@ View::View(QWidget *parent) : QGLWidget(parent)
     m_water_a = glm::vec3(0.0, 0.8, 1.0);
     // object diffuse color
     m_water_d = glm::vec3(0.0, 0.6, 1.0);
+
+	//create a World for Entities to live in
+	m_world = new World();
+
+	addSphere(glm::vec3(.2,.2,.2), .02, glm::vec3(-.1,-.1,-.1));
+	addSphere(glm::vec3(.1,.1,.1), .02, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -41,6 +50,10 @@ View::~View()
     delete m_sphere;
     delete m_camera;
     delete cubeMap;
+	delete m_world;
+
+	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
+		delete (*it);
 }
 
 void View::initializeGL()
@@ -74,10 +87,12 @@ void View::initializeGL()
     m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
 
 
+
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_object_shader, 30);
     m_water = new WaterSurface(m_water_shader, 100);
+	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -86,6 +101,9 @@ glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     //m_spheres_pos.push_back(glm::translate(glm::vec3(2.0f, 0.0f, 0.0f))*glm::scale(glm::vec3(2.0, 2.0, 2.0))*glm::mat4x4(1.0));
 
 
+	//glEnable(GL_CULL_FACE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -118,8 +136,7 @@ void View::paintGL()
     glViewport(0, 0, width(), height());
 
     // Render the scene.
-
-    cubeMap->draw();
+	cubeMap->draw();
 
     glUseProgram(m_object_shader);
 
@@ -135,35 +152,32 @@ void View::paintGL()
     // draw the m_spheres in their appropriate locations
     glBindVertexArray(m_sphere->m_vao);
 
-    for (int i=0; i<m_spheres_pos.size(); i++) {
-      glm::mat3 normal_matrix = glm::mat3x3(glm::transpose(glm::inverse(m_spheres_pos.at(i))));
-      glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(normal_matrix));
-      m_sphere->Draw(m_spheres_pos.at(i), m_uni["m"]);
+	for(int i=0; i < m_sphere_entities.size(); i++) {
+		SphereEntity *current = m_sphere_entities.at(i);
+		glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
+		m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
     }
     glBindVertexArray(0);
     //glUseProgram(0);
 
 
-    /*glUseProgram(m_water_shader);
-    glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
-    glUniform1f(glGetUniformLocation(m_water_shader, "k_d"), m_k_d);
-    glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
-    glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
-    glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
-    glUseProgram(0);
-    
-    
-    glUseProgram(m_water_shader);
-    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
-    m_water->ApplyImpulses();
-    m_water->UpdateHeights();
-    m_water->GenVertsFromHeight();
-    glBindVertexArray(m_water->m_vao);
-    m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
-    glBindVertexArray(0);
-    glUseProgram(0);
+	/*glUseProgram(m_water_shader);
+	glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
+	glUniform1f(glGetUniformLocation(m_water_shader, "k_d"), m_k_d);
+	glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
+	glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
+	glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
+	glUseProgram(0);
+
+
+	glUseProgram(m_water_shader);
+	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
+	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
+	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
+	m_water->GenVertsFromHeight();
+	glBindVertexArray(m_water->m_vao);
+	m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
+	glBindVertexArray(0);
 }
 
 
@@ -228,8 +242,21 @@ void View::tick()
     // Get the number of seconds since the last tick (variable update rate)
     float seconds = time.restart() * 0.001f;
 
+	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
+		(*it)->applyForceAt(GRAVITY, glm::vec3());
+
     // TODO: Implement the demo update here
+	m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
+}
+
+void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity)
+{
+	SphereEntity *temp = new SphereEntity(worldLocation, radius);
+
+	temp->m_velocity = velocity;
+	m_sphere_entities.push_back(temp);
+	m_world->addEntity(temp);
 }

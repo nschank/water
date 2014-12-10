@@ -7,6 +7,7 @@
 #include "cubemap.h"
 #include "sphere.h"
 #include "watersurface.h"
+#include "world.h"
 
 #include <QTime>
 #include <QTimer>
@@ -22,8 +23,7 @@ public:
     ~View();
 
     GLuint m_object_shader, m_water_shader;
-    std::map<std::string, GLint> m_uni;
-    std::vector<glm::mat4x4> m_spheres_pos;
+	std::map<std::string, GLint> m_uni;
     Sphere *m_sphere;
     Camera *m_camera;
     std::vector<glm::mat3x3> m_normal_matrices;
@@ -44,6 +44,10 @@ private:
     glm::vec3 m_object_a, m_object_d, m_i_a,
               m_water_a, m_water_d;
 
+	CubeMap* cubeMap;
+	World *m_world;
+	std::vector<SphereEntity *> m_sphere_entities;
+
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
@@ -55,7 +59,8 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-CubeMap* cubeMap;
+
+	void addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity);
 
 
 private slots:

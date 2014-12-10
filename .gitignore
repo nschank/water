@@ -2,3 +2,4 @@ Make*
 debug
 object_script*
 *.user
+moc_*
