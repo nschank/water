@@ -8,26 +8,85 @@ class Camera
 public:
     Camera(int px_w, int px_h);
 
-    glm::mat4x4 P();
-    glm::mat4x4 V();
+private:
 
+    int m_px_w, m_px_h;
+    float m_aspect_ratio;
+    float m_near_plane, m_far_plane;
+    float m_height_angle;
+    glm::vec4 m_eye, m_look, m_up;
+
+    glm::mat4x4 scale_mat;
+    glm::vec3 m_u, m_v, m_w;
+    // translation coords
+    float m_x, m_y, m_z;
+
+    glm::mat4x4 m_view_mat, m_scale_mat, m_persp_mat, m_proj_mat;
+public:
     void MouseMoved(int dx, int dy);
     void MouseScrolled(int units);
 
+    void ComputeView();
     bool CastRayAtObject(glm::vec3 *hit, glm::mat4x4 model);
 
-private:
+    // Sets the aspect ratio of this camera. Automatically called by the GUI when the window is
+    // resized.
+    virtual void setAspectRatio(float aspectRatio);
 
-    glm::mat4x4 m_p, m_v;
+    // Returns the projection matrix given the current camera settings.
+    virtual glm::mat4x4 getProjectionMatrix() const;
 
-    glm::vec3 m_eye, m_target, m_up;
-    float m_fov;
-    float m_aspect;
-    float m_near;
-    float m_far;
+    // Returns the view matrix given the current camera settings.
+    virtual glm::mat4x4 getViewMatrix() const;
 
-    int m_px_w, m_px_h;
+    // Returns the matrix that scales down the perspective view volume into the canonical
+    // perspective view volume, given the current camera settings.
+    virtual glm::mat4x4 getScaleMatrix() const;
+
+    virtual glm::mat4x4 getM2() const;
+    virtual glm::vec4 getEye() const;
+    // Returns the matrix the unhinges the perspective view volume, given the current camera
+    // settings.
+    virtual glm::mat4x4 getPerspectiveMatrix() const;
+
+    // Returns the current position of the camera.
+    glm::vec4 getPosition() const;
+
+    // Returns the current 'look' vector for this camera.
+    glm::vec4 getLook() const;
+
+    // Returns the current 'up' vector for this camera (the 'V' vector).
+    glm::vec4 getUp() const;
+
+    // Returns the currently set aspect ratio.
+    float getAspectRatio() const;
+
+    // Returns the currently set height angle.
+    float getHeightAngle() const;
+
+    // Move this camera to a new eye position, and orient the camera's axes given look and up
+    // vectors.
+    void orientLook(const glm::vec4 &eye, const glm::vec4 &look, const glm::vec4 &up);
+
+    // Sets the height angle of this camera.
+    void setHeightAngle(float h);
+
+    // Translates the camera along a given vector.
+    void translate(const glm::vec4 &v);
+
+    // Rotates the camera about the U axis by a specified number of degrees.
+    void rotateU(float degrees);
+
+    // Rotates the camera about the V axis by a specified number of degrees.
+    void rotateV(float degrees);
+
+    // Rotates the camera about the W axis by a specified number of degrees.
+    void rotateW(float degrees);
+
+    // Sets the near and far clip planes for this camera.
+    void setClip(float nearPlane, float farPlane);
 
 };
+
 
 #endif // CAMERA_H

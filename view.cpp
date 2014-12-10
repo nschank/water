@@ -128,13 +128,12 @@ void View::paintGL()
     glViewport(0, 0, width(), height());
 
     // Render the scene.
-
 	cubeMap->draw();
 
     glUseProgram(m_object_shader);
 
-    glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->P()));
-    glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->V()));
+    glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
+    glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
     
     glUniform1f(glGetUniformLocation(m_object_shader, "k_a"), m_k_a);
     glUniform1f(glGetUniformLocation(m_object_shader, "k_d"), m_k_d);
@@ -162,16 +161,13 @@ void View::paintGL()
 
 
 	glUseProgram(m_water_shader);
-	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->P()));
-	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->V()));
+	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
+	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
 	m_water->GenVertsFromHeight();
 	glBindVertexArray(m_water->m_vao);
 	m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
 	glBindVertexArray(0);
-
-
-    glUseProgram(0);
 }
 
 

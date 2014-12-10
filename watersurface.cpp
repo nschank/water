@@ -55,7 +55,7 @@ void WaterSurface::InitializeHeights() {
     int ind, i, j;
     for (i=0; i<m_subdivs+1; i++) {
         for (j=0; j<m_subdivs+1; j++) {
-            ind = i*m_subdivs + j;
+            ind = i*(m_subdivs+1) + j;
             m_h1[ind] = 0.0f;
             m_h2[ind] = 0.0f;
         }
@@ -77,6 +77,26 @@ m_h1[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
     }
     std::swap(m_h1, m_h2);
 }
+
+/*void WaterSurface::UpdateNormals() {
+    float top, left, right, bottom, center;
+    float cell_dist = 1.0/m_subdivs;
+    for (int i=1; i<m_subdivs; i++) {
+        for (j=1; j<m_subdivs; j++) {
+           center = m_h2[i*(m_subdivs+1) + j];
+           top = m_h2[(i-1)*(m_subdivs+1) + j];
+           bottom = m_h2[(i+1)*(m_subdivs+1) + j];
+           left = m_h2[i*(m_subdivs+1) + j-1];
+           right = m_h2[i*(m_subdivs+1) + j+1];
+
+           glm::vec3(-cell_dist)
+
+           m_normals[i*(m_subdivs+1) + j] =
+
+
+        }
+    }
+}*/
 
 void WaterSurface::ApplyImpulses() {
     for (int i=0; i<m_impulses.size(); i++) {

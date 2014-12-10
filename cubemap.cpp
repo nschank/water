@@ -112,8 +112,8 @@ void CubeMap::loadSide(const char* filename, GLenum side) {
 void CubeMap::draw() {
   glDepthMask(GL_FALSE);
   glUseProgram(cubemapShader);
-  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "view"), 1, GL_FALSE, glm::value_ptr(camera->V()));
-  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "projection"), 1, GL_FALSE, glm::value_ptr(camera->P()));
+  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "view"), 1, GL_FALSE, glm::value_ptr(camera->getViewMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "projection"), 1, GL_FALSE, glm::value_ptr(camera->getProjectionMatrix()));
   glBindVertexArray(vao);
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(glGetUniformLocation(cubemapShader, "skybox"), 0);
