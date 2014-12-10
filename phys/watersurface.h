@@ -11,7 +11,7 @@ public:
 	WaterSurface();
 	virtual ~WaterSurface();
 
-	Collision *collisionWith(Entity *other);
+	void collideWith(Entity *other);
 
 	void applyTranslationAt(glm::vec3 translation, glm::vec3 location);
 	void applyImpulseAt(glm::vec3 impulse, glm::vec3 location);
@@ -19,8 +19,14 @@ public:
 	void tick(float secondsSinceLastTick);
 
 protected:
-	Collision *collisionWithSphere(Sphere *other);
-	Collision *collisionWithSurface(WaterSurface *other);
+	void collideWithSphere(Sphere *other);
+	void collideWithSurface(WaterSurface *other);
+
+	float heightAt(float x, float y);
+	float getXResolution();
+	float getYResolution();
+
+	float getMaxHeight();
 };
 
 #endif // WATERSURFACE_H

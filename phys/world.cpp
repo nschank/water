@@ -23,11 +23,7 @@ void World::tick(float secondsSinceLastTick)
 			Entity *A = m_entities[i];
 			Entity *B = m_entities[j];
 
-			Collision *collision = A->collisionWith(B);
-
-			if(collision == NULL) continue;
-			collision->react();
-			delete collision;
+			A->collideWith(B);
 		}
 
 	for(std::vector<Entity *>::const_iterator it = m_entities.begin(); it != m_entities.end(); it++)

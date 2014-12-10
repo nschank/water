@@ -31,7 +31,6 @@ HEADERS += mainwindow.h \
     OrbitingCamera.h \
     CamtransCamera.h \
     phys/entity.h \
-    phys/collision.h \
     phys/sphere.h \
     phys/world.h \
     phys/watersurface.h

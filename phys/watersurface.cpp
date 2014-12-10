@@ -33,20 +33,39 @@ void WaterSurface::tick(float secondsSinceLastTick)
 
 }
 
-Collision *WaterSurface::collisionWith(Entity *other)
+void WaterSurface::collideWith(Entity *other)
 {
-	return other->collisionWithSurface(this);
+	other->collideWithSurface(this);
 }
 
 
-Collision *WaterSurface::collisionWithSphere(Sphere *other)
+void WaterSurface::collideWithSphere(Sphere *other)
 {
-	return other->collisionWithSurface(this);
+	other->collideWithSurface(this);
 }
 
-Collision *WaterSurface::collisionWithSurface(WaterSurface *other)
+void WaterSurface::collideWithSurface(WaterSurface *other)
 {
-	//No thank you
-	return NULL;
+	//does nothing
+}
+
+float WaterSurface::heightAt(float x, float y)
+{
+	return 0;
+}
+
+float WaterSurface::getXResolution()
+{
+	return .001;
+}
+
+float WaterSurface::getYResolution()
+{
+	return .001;
+}
+
+float WaterSurface::getMaxHeight()
+{
+	return .5;
 }
 
