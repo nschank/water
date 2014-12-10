@@ -156,11 +156,11 @@ void Camera::rotateW(float degrees)
     calculateView();
 }
 
-void Camera::setClip(float near, float far)
+void Camera::setClip(float nearPlane, float farPlane)
 {
-    nearPlane = near;
-    farPlane = far;
-    float c = -near/far;
+	this->nearPlane = nearPlane;
+	this->farPlane = farPlane;
+	float c = -nearPlane/farPlane;
     perspectiveMatrix = glm::perspective(55.0f, 1.0f, 0.01f, 10.0f);
     /*perspectiveMatrix = glm::transpose(
                   glm::mat4x4(1.0f, 0.0f, 0.0f, 0.0f,
