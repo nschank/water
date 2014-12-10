@@ -174,7 +174,7 @@ void WaterSurface::GenVertsFromHeight() {
     //glGenBuffers(1, &m_vbo);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3*m_total_verts*sizeof(GLfloat), m_verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3*m_total_verts*sizeof(GLfloat), m_verts, GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

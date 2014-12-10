@@ -1,5 +1,7 @@
 #include "SphereEntity.h"
 #include "watersurface.h"
+#include <stdio.h>
+#include <iostream>
 
 SphereEntity::SphereEntity(glm::vec3 worldLocation, float radius) :
 	m_center(worldLocation), m_radius(radius), m_mass(SphereEntity_MASS), m_cor(SphereEntity_COR)
@@ -98,11 +100,13 @@ void SphereEntity::applyForceAt(glm::vec3 force, glm::vec3 location)
 
 void SphereEntity::tick(float secondsSinceLastTick)
 {
-	m_velocity += (impulsesThisTick + (forcesThisTick * secondsSinceLastTick))/m_mass;
+	if(m_mass > 0)
+		m_velocity += (impulsesThisTick + (forcesThisTick * secondsSinceLastTick))/m_mass;
 	impulsesThisTick = glm::vec3();
 	forcesThisTick = glm::vec3();
 
 	m_center += (m_velocity * secondsSinceLastTick);
+	updateMatrices();
 }
 
 glm::mat4 SphereEntity::modelMatrix()
@@ -117,6 +121,6 @@ glm::mat3 SphereEntity::normalMatrix()
 
 void SphereEntity::updateMatrices()
 {
-	m_modelMatrix = glm::translate(glm::mat4(), m_center)*glm::scale(glm::mat4(), glm::vec3(m_radius));
+	m_modelMatrix = glm::translate(m_center)*glm::scale(glm::vec3(m_radius*2));
 	m_normalMatrix = glm::mat3x3(glm::transpose(glm::inverse(m_modelMatrix)));
 }

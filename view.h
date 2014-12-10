@@ -44,6 +44,7 @@ private:
     glm::vec3 m_object_a, m_object_d, m_i_a,
               m_water_a, m_water_d;
 
+	CubeMap* cubeMap;
 	World *m_world;
 	std::vector<SphereEntity *> m_sphere_entities;
 
@@ -58,7 +59,8 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-CubeMap* cubeMap;
+
+	void addSphere(glm::vec3 worldLocation, float radius);
 
 
 private slots:

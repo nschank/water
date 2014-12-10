@@ -5,9 +5,9 @@ Camera::Camera(int px_w, int px_h)
     m_px_w = px_w;
     m_px_h = px_h;
 
-    m_eye = glm::vec3(0.0f, 2.0f, 0.0f);
-    m_target = glm::vec3(0.0f, 0.0f, 0.0f);
-    m_up = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_eye = glm::vec3(-1.0f, 0.02f, 0.0f);
+	m_target = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     m_fov = 55.0f;
     m_aspect = 1.0f;
