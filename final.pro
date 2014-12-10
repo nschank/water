@@ -6,8 +6,8 @@ TEMPLATE = app
 QMAKE_CXXFLAGS += -g
 
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
-INCLUDEPATH += glm lib
-DEPENDPATH += glm lib
+INCLUDEPATH += glm lib phys
+DEPENDPATH += glm lib phys
 
 SOURCES += main.cpp \
     mainwindow.cpp \
@@ -16,7 +16,10 @@ SOURCES += main.cpp \
     sphere.cpp \
     camera.cpp \
     watersurface.cpp \
-    cubemap.cpp
+    cubemap.cpp \
+    phys/entity.cpp \
+    phys/world.cpp \
+    phys/sphereentity.cpp
 
 HEADERS += mainwindow.h \
     view.h \
@@ -25,7 +28,10 @@ HEADERS += mainwindow.h \
     camera.h \
     common.h \
     watersurface.h \
-    cubemap.h
+    cubemap.h \
+    phys/world.h \
+    phys/entity.h \
+    phys/sphereentity.h
 
 FORMS += mainwindow.ui
 
