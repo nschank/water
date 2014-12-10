@@ -2,29 +2,26 @@
 uniform float k_a, k_d;
 uniform vec3 object_a, object_d, ambient_intensity;
 
-varying vec3 pos;
-varying vec3 norm;
-varying vec4 pos4;
+in vec3 pos;
+in vec3 nnorm;
+in vec4 pos4;
 
-const vec3 light = vec3(0.0f, 9.0f, 0.0f);
+const vec3 light = vec3(3.0f, 0.0f, 0.0f);
 
 void main()
 {
-  vec3 vPos = vec3(pos4)/pos4.w;
+  vec3 norm = -nnorm;
   vec3 lightDirection = normalize(light - pos);
-  lightDirection.y = -lightDirection.y;
+  //lightDirection.y = -lightDirection.y;
   float d = max(0.0f, dot(norm, lightDirection));
   float specular = 0.0f;
-  if(d > 0.0f) {
-    //lightDirection = normalize(light - vPos);
-    //lightDirection.y = -lightDirection.y;
+  /*if(d > 0.0f) {
     vec3 reflected = reflect(-lightDirection, norm);
-    // either use normalize(vPos) or normalize(pos)                   ???
-    float specularAngle = max(0.0f, dot(reflected, normalize(vPos)));
+    float specularAngle = max(0.0f, dot(reflected, normalize(pos)));
     specular = pow(specularAngle, 5.0f);
-  }
+  }*/
   vec3 color = ambient_intensity*object_a*k_a +
-               object_d*d*k_d + vec3(specular, specular, specular);
+               object_d*d*k_d + vec3(specular);
   clamp(color, 0.0f, 1.0f);
   gl_FragColor = vec4(color, 1.0f);
 }

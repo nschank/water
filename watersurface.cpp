@@ -63,7 +63,7 @@ void WaterSurface::InitializeHeights() {
 
 void WaterSurface::UpdateHeights() {
     int ind, i, j;
-    float damping = 0.98;
+    float damping = 0.95;
     // iterate over non edge components
     for (i=1; i<m_subdivs; i++) {
         for (j=1; j<m_subdivs;j++) {
@@ -71,6 +71,7 @@ void WaterSurface::UpdateHeights() {
                                           m_h2[(i-1)*(m_subdivs+1) + j] +
                                           m_h2[i*(m_subdivs+1) + (j+1)] +
                                           m_h2[i*(m_subdivs+1) + (j-1)])/2.0 - m_h1[i*(m_subdivs+1) + j]) * damping;
+m_h1[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
         }
     }
     std::swap(m_h1, m_h2);
@@ -99,7 +100,7 @@ void WaterSurface::ApplyImpulseRadius(glm::vec3 impulse, float rad) {
 
     for (int i=min_y; i<=max_y; i++) {
         for (int j=min_x; j<=max_x; j++) {
-            m_h2[i*(m_subdivs+1) + j] = glm::min(m_h2[i*(m_subdivs+1)+j] + 0.5, 1.0);
+            m_h2[i*(m_subdivs+1) + j] = glm::min(m_h2[i*(m_subdivs+1)+j] + 0.5, 0.5);
         }
     }
 }

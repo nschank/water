@@ -75,13 +75,13 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_object_shader, 30);
-    m_water = new WaterSurface(m_object_shader, 200);
-    m_water_transform = glm::translate(glm::vec3(1.0f, 0.0f, 0.0f));
+    m_water = new WaterSurface(m_water_shader, 100);
+    m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
 //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    //m_spheres_pos.push_back(glm::mat4x4(1.0));
-    //m_spheres_pos.push_back(glm::translate(glm::vec3(1.0f, 0.0f, 0.0f))*glm::mat4x4(1.0));
+    m_spheres_pos.push_back(glm::mat4x4(1.0));
+    m_spheres_pos.push_back(glm::translate(glm::vec3(0.5f, 0.0f, 0.0f))*glm::mat4x4(1.0));
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -115,12 +115,14 @@ void View::paintGL()
     glViewport(0, 0, width(), height());
 
     // Render the scene.
-cubeMap->draw();
+
+    cubeMap->draw();
+
     glUseProgram(m_object_shader);
 
     glUniformMatrix4fv(m_uni["p"], 1, GL_FALSE, glm::value_ptr(m_camera->P()));
     glUniformMatrix4fv(m_uni["v"], 1, GL_FALSE, glm::value_ptr(m_camera->V()));
-
+    
     glUniform1f(glGetUniformLocation(m_object_shader, "k_a"), m_k_a);
     glUniform1f(glGetUniformLocation(m_object_shader, "k_d"), m_k_d);
     glUniform3fv(glGetUniformLocation(m_object_shader, "object_a"), 1, glm::value_ptr(m_object_a));
@@ -144,14 +146,20 @@ cubeMap->draw();
     glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
     glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
     glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
-
+    glUseProgram(0);
+    
+    
+    /*glUseProgram(m_water_shader);
+    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->P()));
+    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->V()));
+    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
     m_water->ApplyImpulses();
     m_water->UpdateHeights();
     m_water->GenVertsFromHeight();
     glBindVertexArray(m_water->m_vao);
-    m_water->Draw(m_water_transform, m_uni["m"]);
+    m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
     glBindVertexArray(0);
-    glUseProgram(0);
+    glUseProgram(0);*/
 }
 
 

@@ -1,12 +1,12 @@
 #include "cubemap.h"
 #include <stdio.h>
 
-const char *CubeMap::topFilename = "clouds.jpg";
-const char *CubeMap::bottomFilename = "clouds.jpg";
-const char *CubeMap::leftFilename = "clouds.jpg";
-const char *CubeMap::rightFilename = "clouds.jpg";
-const char *CubeMap::frontFilename = "clouds.jpg";
-const char *CubeMap::backFilename = "clouds.jpg";
+const char *CubeMap::topFilename = "top.png";
+const char *CubeMap::bottomFilename = "bottom.png";
+const char *CubeMap::leftFilename = "left.png";
+const char *CubeMap::rightFilename = "right.png";
+const char *CubeMap::frontFilename = "front.png";
+const char *CubeMap::backFilename = "back.png";
 
 CubeMap::CubeMap(Camera* cam) {
   camera = cam;
@@ -37,50 +37,52 @@ CubeMap::CubeMap(Camera* cam) {
   GLint vertex = glGetAttribLocation(cubeTexture, "vertex");
   glEnableVertexAttribArray(vertex);
   glVertexAttribPointer(vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  
+
+  float size = 3.0f;
+
   GLfloat skyboxVertices[] = {
     // Positions          
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
+    -size,  size, -size,
+    -size, -size, -size,
+     size, -size, -size,
+     size, -size, -size,
+     size,  size, -size,
+    -size,  size, -size,
 
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
+    -size, -size,  size,
+    -size, -size, -size,
+    -size,  size, -size,
+    -size,  size, -size,
+    -size,  size,  size,
+    -size, -size,  size,
 
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
+     size, -size, -size,
+     size, -size,  size,
+     size,  size,  size,
+     size,  size,  size,
+     size,  size, -size,
+     size, -size, -size,
 
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
+    -size, -size,  size,
+    -size,  size,  size,
+     size,  size,  size,
+     size,  size,  size,
+     size, -size,  size,
+    -size, -size,  size,
 
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
+    -size,  size, -size,
+     size,  size, -size,
+     size,  size,  size,
+     size,  size,  size,
+    -size,  size,  size,
+    -size,  size, -size,
 
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
+    -size, -size, -size,
+    -size, -size,  size,
+     size, -size, -size,
+     size, -size, -size,
+    -size, -size,  size,
+     size, -size,  size
   };
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
