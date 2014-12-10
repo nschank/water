@@ -5,7 +5,7 @@
 #include "lib/ResourceLoader.h"
 #include "sphereentity.h"
 
-#define GRAVITY (glm::vec3(0,0,0))
+#define GRAVITY (glm::vec3(0,-9.8,0))
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -41,6 +41,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
+	addSphere(glm::vec3(0,2.5,0), .03, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -93,11 +94,7 @@ void View::initializeGL()
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
-glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     std::vector<glm::mat3> normal_matrices;
-    //m_spheres_pos.push_back(glm::mat4x4(1.0));
-    //m_spheres_pos.push_back(glm::translate(glm::vec3(2.0f, 0.0f, 0.0f))*glm::scale(glm::vec3(2.0, 2.0, 2.0))*glm::mat4x4(1.0));
-
 
 	//glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
