@@ -47,8 +47,8 @@ void SphereEntity::collideWithSphere(SphereEntity *other)
 	float myMoveWeight = other->m_mass/(m_mass + other->m_mass);
 	float otherMoveWeight = 1 - myMoveWeight;
 
-	applyTranslationAt(distance*meToOtherUnitMTV* -myMoveWeight, m_center);
-	other->applyTranslationAt(distance*meToOtherUnitMTV*otherMoveWeight, other->m_center);
+	applyTranslationAt((m_radius+other->m_radius - distance)*meToOtherUnitMTV* -myMoveWeight, m_center);
+	other->applyTranslationAt((m_radius+other->m_radius - distance)*meToOtherUnitMTV*otherMoveWeight, other->m_center);
 }
 
 void SphereEntity::collideWithSurface(WaterSurface *surface)
@@ -79,7 +79,7 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 
 	if(m_center.y > m_radius) return;
 
-	applyImpulseAt(glm::vec3(0,-m_velocity.y,0),m_center);
+	applyImpulseAt(glm::vec3(0,-m_velocity.y*(1+m_cor)*m_mass,0),m_center);
 	m_center.y = m_radius;
 }
 

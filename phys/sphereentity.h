@@ -4,7 +4,7 @@
 #include "entity.h"
 
 #define SphereEntity_MASS (10)
-#define SphereEntity_COR (.5)
+#define SphereEntity_COR (.2)
 
 class SphereEntity : public Entity
 {
@@ -24,13 +24,15 @@ public:
 	glm::mat3 normalMatrix();
 	glm::mat4 modelMatrix();
 
+	glm::vec3 m_velocity;
+
 protected:
 	void collideWithSphere(SphereEntity *other);
 	void collideWithSurface(WaterSurface *other);
 	void updateMatrices();
 
 	glm::vec3 m_center;
-	glm::vec3 m_velocity;
+
 	float m_radius;
 	float m_mass;
 	float m_cor;

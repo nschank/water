@@ -60,7 +60,7 @@ private:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
-	void addSphere(glm::vec3 worldLocation, float radius);
+	void addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity);
 
 
 private slots:

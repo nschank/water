@@ -5,7 +5,7 @@
 #include "lib/ResourceLoader.h"
 #include "sphereentity.h"
 
-#define GRAVITY (glm::vec3(0,-3,0))
+#define GRAVITY (glm::vec3(0,0,0))
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -41,9 +41,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
-	addSphere(glm::vec3(.4,.5,.4), .02);
-	addSphere(glm::vec3(.1,.5,.1), .02);
-	addSphere(glm::vec3(-.3,.5,-.3), .02);
+	addSphere(glm::vec3(.2,.2,.2), .02, glm::vec3(-.1,-.1,-.1));
+	addSphere(glm::vec3(.1,.1,.1), .02, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -247,9 +246,11 @@ void View::tick()
     update();
 }
 
-void View::addSphere(glm::vec3 worldLocation, float radius)
+void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity)
 {
 	SphereEntity *temp = new SphereEntity(worldLocation, radius);
+
+	temp->m_velocity = velocity;
 	m_sphere_entities.push_back(temp);
 	m_world->addEntity(temp);
 }
