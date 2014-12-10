@@ -54,7 +54,7 @@ void WaterSurface::InitializeHeights() {
     int ind, i, j;
     for (i=0; i<m_subdivs+1; i++) {
         for (j=0; j<m_subdivs+1; j++) {
-            ind = i*m_subdivs + j;
+            ind = i*(m_subdivs+1) + j;
             m_h1[ind] = 0.0f;
             m_h2[ind] = 0.0f;
         }
