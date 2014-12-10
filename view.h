@@ -26,7 +26,7 @@ public:
     std::vector<glm::mat4x4> m_spheres_pos;
     Sphere *m_sphere;
     Camera *m_camera;
-
+    std::vector<glm::mat3x3> m_normal_matrices;
     WaterSurface *m_water;
     glm::mat4x4 m_water_transform;
 

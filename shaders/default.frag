@@ -6,7 +6,7 @@ in vec3 pos;
 in vec3 nnorm;
 in vec4 pos4;
 
-const vec3 light = vec3(3.0f, 0.0f, 0.0f);
+const vec3 light = vec3(3.0f, 3.0f, 3.0f);
 
 void main()
 {
