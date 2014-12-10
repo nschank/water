@@ -54,7 +54,7 @@ private:
     float *m_verts;
     int m_total_verts, m_subdivs;
 
-    float *m_h1, *m_h2;
+    float *m_vel, *m_height;
 
     glm::vec3 *m_normals;
 

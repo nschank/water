@@ -44,14 +44,14 @@ OTHER_FILES += \
     shaders/cubemap.vert
 
 #####SUNLAB##########
-#LIBS += -L/course/cs123/lib/glew/glew-1.10.0/include -lGLEW
-#INCLUDEPATH += /course/cs123/lib/glew/glew-1.10.0/include
-#DEPENDPATH += /course/cs123/lib/glew/glew-1.10.0/include
+LIBS += -L/course/cs123/lib/glew/glew-1.10.0/include -lGLEW
+INCLUDEPATH += /course/cs123/lib/glew/glew-1.10.0/include
+DEPENDPATH += /course/cs123/lib/glew/glew-1.10.0/include
 
 #######WINDOWS#######
-INCLUDEPATH += glew
-DEPENDPATH += glew
-DEFINES += GLEW_STATIC __AT_HOME__
-HEADERS += glew/glew.h glew/wglew.h
-SOURCES += glew/glew.c
+#INCLUDEPATH += glew
+#DEPENDPATH += glew
+#DEFINES += GLEW_STATIC __AT_HOME__
+#HEADERS += glew/glew.h glew/wglew.h
+#SOURCES += glew/glew.c
 

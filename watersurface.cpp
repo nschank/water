@@ -5,8 +5,8 @@ WaterSurface::WaterSurface(GLuint shader, int subdivs)
 {
     m_subdivs = subdivs;
 
-    m_h1 = new float[(subdivs+1)*(subdivs+1)];
-    m_h2 = new float[(subdivs+1)*(subdivs+1)];
+    m_vel = new float[(subdivs+1)*(subdivs+1)];
+    m_height = new float[(subdivs+1)*(subdivs+1)];
 
     m_verts = new float[18*subdivs*subdivs];
 
@@ -39,8 +39,8 @@ WaterSurface::WaterSurface(GLuint shader, int subdivs)
 
 
 WaterSurface::~WaterSurface() {
-    delete[] m_h1;
-    delete[] m_h2;
+    delete[] m_vel;
+    delete[] m_height;
     delete[] m_verts;
 }
 
@@ -56,26 +56,33 @@ void WaterSurface::InitializeHeights() {
     for (i=0; i<m_subdivs+1; i++) {
         for (j=0; j<m_subdivs+1; j++) {
             ind = i*(m_subdivs+1) + j;
-            m_h1[ind] = 0.0f;
-            m_h2[ind] = 0.0f;
+            m_vel[ind] = 0.0f;
+            m_height[ind] = 0.0f;
         }
     }
 }
 
+
+// really update velocities
 void WaterSurface::UpdateHeights() {
     int ind, i, j;
     float damping = 0.95;
     // iterate over non edge components
     for (i=1; i<m_subdivs; i++) {
         for (j=1; j<m_subdivs;j++) {
-            m_h1[i*(m_subdivs+1) + j] = ((m_h2[(i+1)*(m_subdivs+1) + j] +
-                                          m_h2[(i-1)*(m_subdivs+1) + j] +
-                                          m_h2[i*(m_subdivs+1) + (j+1)] +
-                                          m_h2[i*(m_subdivs+1) + (j-1)])/2.0 - m_h1[i*(m_subdivs+1) + j]) * damping;
-m_h1[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
+            for (i=1; i<m_subdivs; i++) {
+                    for (j=1; j<m_subdivs;j++) {
+                        m_vel[i*(m_subdivs+1) + j] = ((m_height[(i+1)*(m_subdivs+1) + j] +
+                                                      m_height[(i-1)*(m_subdivs+1) + j] +
+                                                      m_height[i*(m_subdivs+1) + (j+1)] +
+                                                      m_height[i*(m_subdivs+1) + (j-1)])/2.0 - m_vel[i*(m_subdivs+1) + j]) * damping;
+                        //m_vel[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
+                    }
+                }
+                std::swap(m_vel, m_height);
         }
     }
-    std::swap(m_h1, m_h2);
+    //std::swap(m_vel, m_height);
 }
 
 /*void WaterSurface::UpdateNormals() {
@@ -101,7 +108,10 @@ m_h1[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
 void WaterSurface::ApplyImpulses() {
     for (int i=0; i<m_impulses.size(); i++) {
         glm::vec3 impulse = m_impulses.at(i);
-        ApplyImpulseRadius(impulse, 0.2);
+        int closest_x, closest_y;
+        closest_x = glm::max(0, glm::min(m_subdivs, int(((impulse.x + 0.5) / 1.0)*m_subdivs)));
+        closest_y = glm::max(0, glm::min(m_subdivs, int(((impulse.z + 0.5) / 1.0)*m_subdivs)));
+        m_vel[closest_y*(m_subdivs + 1) + closest_x] += impulse.y;
     }
     m_impulses.clear();
 }
@@ -121,7 +131,7 @@ void WaterSurface::ApplyImpulseRadius(glm::vec3 impulse, float rad) {
 
     for (int i=min_y; i<=max_y; i++) {
         for (int j=min_x; j<=max_x; j++) {
-            m_h2[i*(m_subdivs+1) + j] = glm::min(m_h2[i*(m_subdivs+1)+j] + 0.5, 0.5);
+            m_vel[i*(m_subdivs+1) + j] = glm::min(m_vel[i*(m_subdivs+1)+j] + 0.5, 0.5);
         }
     }
 }
@@ -144,7 +154,7 @@ void WaterSurface::GenVertsFromHeight() {
             // triangle 1
             // v1
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_h2[i*(m_subdivs+1) + j], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -152,14 +162,14 @@ void WaterSurface::GenVertsFromHeight() {
 
             // v2
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_h2[i*(m_subdivs+1) + j+1], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j+1], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
             //m_verts[m++] = nz;
             // v3
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_h2[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -167,14 +177,14 @@ void WaterSurface::GenVertsFromHeight() {
             // triangle 2
             // v4
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_h2[i*(m_subdivs+1) + j], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
             //m_verts[m++] = nz;
             // v5
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_h2[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -182,7 +192,7 @@ void WaterSurface::GenVertsFromHeight() {
 
             //v6
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_h2[(i+1)*(m_subdivs+1) + j], MAX_HEIGHT);
+            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j], MAX_HEIGHT);
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -207,7 +217,7 @@ void WaterSurface::applyTranslationAt(glm::vec3 translation, glm::vec3 location)
 
 void WaterSurface::applyImpulseAt(glm::vec3 impulse, glm::vec3 location)
 {
-
+    m_impulses.push_back(impulse + location);
 }
 
 void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
@@ -217,8 +227,9 @@ void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
 
 void WaterSurface::tick(float secondsSinceLastTick)
 {
-	ApplyImpulses();
+    ApplyImpulses();
 	UpdateHeights();
+
 }
 
 void WaterSurface::collideWith(Entity *other)
