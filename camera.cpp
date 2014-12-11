@@ -1,15 +1,20 @@
 #include "camera.h"
+
 Camera::Camera(int px_w, int px_h)
 {
     m_px_w = px_w;
     m_px_h = px_h;
-    setClip(1.0f, 30.0f);
-      setHeightAngle(60.0f);
+	setClip(NEAR_PLANE, FAR_PLANE);
+	  setHeightAngle(HEIGHT_ANGLE);
       setAspectRatio(1.0f);
-      orientLook(glm::vec4(0.0f, 3.0f, 0.0f, 1.0f),
-                 glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-                 glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-
+	if(LOOK_SETTING_ACROSS)
+		orientLook(glm::vec4(0.f, .15f, 1.0f, 1.0f),
+				 glm::vec4(0.0f, 0.0f, -1.0f, 0),
+				 glm::vec4(0.0f, 1.0f, 0.0f, 0));
+	else
+		orientLook(glm::vec4(0.0f, .5f, 0.0f, 1.0f),
+				   glm::vec4(0.0f, -1.0f, 0.0f, 0),
+				   glm::vec4(1.0f, 0.0f, 0.0f, 0));
 }
 
 void Camera::setAspectRatio(float a)
@@ -175,13 +180,12 @@ glm::vec4 Camera::getEye() {
 }
 
 bool Camera::CastRayAtObject(glm::vec3 *hit, glm::mat4x4 model) {
-    glm::mat4x4 inv = glm::inverse(model);
-    glm::vec4 model_dir = inv*(glm::vec4(-w, 1.0f));
-    glm::vec4 model_eye = inv*eye;
+	glm::vec3 model_dir = glm::mat3(glm::transpose(glm::inverse(model)))*-1.f*w;
+	glm::vec4 model_eye = glm::inverse(model)*eye;
 
-    float t = (0.5 - model_eye.y)/model_dir.y;
+	float t = - model_eye.y/model_dir.y;
 
-    *hit = glm::vec3(model_dir*t + model_eye);
+	*hit = model_dir*t + glm::vec3(model_eye);
 
     bool on_face = (hit->x >= -0.5 && hit->x <= 0.5 &&
                     hit->z >= -0.5 && hit->z <= 0.5);
@@ -201,14 +205,17 @@ void Camera::MouseMoved(int dx, int dy) {
 
     rotateV(glm::degrees(-x_angle * factor));
     rotateU(glm::degrees(-y_angle * factor));
-    //orientLook(m_eye, -glm::vec4(m_w, 0.0f), m_up);
+    orientLook(eye, -glm::vec4(w, 0.0), up);
 
 }
 
 void Camera::MouseScrolled(int units) {
-    float factor = 1.0/1200.0f;
-    //glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
-    translate(factor * float(units) * glm::vec4(-w, 1.0f));
+	//glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
+	float f = SCROLL_TICK;
+	f *= -1;
+	f *= float(units);
+
+	translate(f * glm::vec4(w,0));
     //orientLook(m_eye, -glm::vec4(m_w, 0.0f), m_up);
 
 }

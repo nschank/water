@@ -9,7 +9,7 @@ in vec3 pos;
 in vec3 norm;
 in mat4 view;
 in vec3 vertexToEye;
-
+in vec3 out_normal;
 const vec3 light = vec3(3.0f, 3.0f, 3.0f);
 
 void main()
@@ -49,6 +49,9 @@ void main()
                //vec3(F*texture(cubeMap, incident));
   clamp(color, 0.0f, 1.0f);
   gl_FragColor = vec4(color, 1.0f);*/
+
+
+
   vec3 lightDirection = normalize(light - pos);
   //lightDirection.y = -lightDirection.y;
   float d = max(0.0f, dot(norm, lightDirection));

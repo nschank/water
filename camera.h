@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "common.h"
+#include "settings.h"
 
 class Camera
 {
@@ -68,7 +69,6 @@ public:
         // Sets the near and far clip planes for this camera.
         void setClip(float nearPlane, float farPlane);
 
-    private:
 
 
     int m_px_w, m_px_h;

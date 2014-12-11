@@ -17,7 +17,6 @@
 class View : public QGLWidget
 {
     Q_OBJECT
-
 public:
     View(QWidget *parent);
     ~View();
@@ -60,7 +59,7 @@ private:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
-	void addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity);
+	void addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity, float buoyancy);
 
 
 private slots:

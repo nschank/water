@@ -4,8 +4,8 @@
 
 #include "lib/ResourceLoader.h"
 #include "sphereentity.h"
-
-#define GRAVITY (glm::vec3(0,0,0))
+#include "settings.h"
+#include <iostream>
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -23,25 +23,31 @@ View::View(QWidget *parent) : QGLWidget(parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     // ambient and diffuse coefficients
-    m_k_a = 0.2f;
-    m_k_d = 0.8f;
+	m_k_a = GLOBAL_AMBIENT_COEFFICIENT;
+	m_k_d = GLOBAL_DIFFUSE_COEFFICIENT;
     // ambient intensity
-    m_i_a = glm::vec3(0.25, 0.25, 0.25);
+	m_i_a = GLOBAL_AMBIENT_INTENSITY;
 
     // object ambient color
-    m_object_a = glm::vec3(1.0, 0.6, 0.6);
+	m_object_a = SPHERE_AMBIENT_COLOR;
     // object diffuse color
-    m_object_d = glm::vec3(1.0, 0.2, 0.2);
+	m_object_d = SPHERE_DIFFUSE_COLOR;
 
     // water ambient and diffuse colors
-    m_water_a = glm::vec3(0.0, 0.8, 1.0);
-    // object diffuse color
-    m_water_d = glm::vec3(0.0, 0.6, 1.0);
+	m_water_a = WATER_AMBIENT_COLOR;
+	// water diffuse color
+	m_water_d = WATER_DIFFUSE_COLOR;
 
 	//create a World for Entities to live in
 	m_world = new World();
 
+	addSphere(glm::vec3(-.4,.3,0), .05, glm::vec3(0,0,0), 1);
+	addSphere(glm::vec3(-.2,.3,0), .05, glm::vec3(0,0,0), 15);
+	addSphere(glm::vec3(0,.3,0), .05, glm::vec3(0,0,0), 30);
+	addSphere(glm::vec3(.2,.3,0), .05, glm::vec3(0,0,0), 45);
+	addSphere(glm::vec3(.4,.3,0), .05, glm::vec3(0,0,0), 60);
 }
+
 
 View::~View()
 {
@@ -69,10 +75,7 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
-    glEnable(GL_DEPTH_TEST);
-
-
-    m_object_shader = ResourceLoader::loadShaders(
+	m_object_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
             "shaders/default.frag");
 
@@ -84,23 +87,18 @@ void View::initializeGL()
     m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
     m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
 
-
-
     m_camera = new Camera(width(), height());
 
-    m_sphere = new Sphere(m_object_shader, 30);
-    m_water = new WaterSurface(m_water_shader, 100);
+	m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
+    m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
-glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     std::vector<glm::mat3> normal_matrices;
-    //m_spheres_pos.push_back(glm::mat4x4(1.0));
-    //m_spheres_pos.push_back(glm::translate(glm::vec3(2.0f, 0.0f, 0.0f))*glm::scale(glm::vec3(2.0, 2.0, 2.0))*glm::mat4x4(1.0));
-
 
 	//glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(POLYGON_MODE)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
@@ -134,7 +132,8 @@ void View::paintGL()
     glViewport(0, 0, width(), height());
 
     // Render the scene.
-	cubeMap->draw();
+	if(USE_CUBE_MAP)
+		cubeMap->draw();
 
     glUseProgram(m_object_shader);
 
@@ -156,7 +155,7 @@ void View::paintGL()
 		m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
     }
     glBindVertexArray(0);
-    //glUseProgram(0);
+    glUseProgram(0);
 
 
 	/*glUseProgram(m_water_shader);
@@ -165,17 +164,20 @@ void View::paintGL()
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
+    int subdivs = 201;
+    glUseProgram(m_water_shader);
+    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
+    //glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
+    glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
+    glUniform1f(glGetUniformLocation(m_water_shader, "k_d"), m_k_d);
+    glUniform3fv(glGetUniformLocation(m_water_shader, "object_a"), 1, glm::value_ptr(m_object_a));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "object_d"), 1, glm::value_ptr(m_object_d));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));
+    glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(m_water_transform)))));
+
+    m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
 	glUseProgram(0);
-
-
-	glUseProgram(m_water_shader);
-	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
-	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
-	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
-	m_water->GenVertsFromHeight();
-	glBindVertexArray(m_water->m_vao);
-	m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
-	glBindVertexArray(0);
 }
 
 
@@ -186,9 +188,21 @@ void View::resizeGL(int w, int h)
 
 void View::mousePressEvent(QMouseEvent *event)
 {
-    glm::vec3 hit;
-    if (m_camera->CastRayAtObject(&hit, m_water_transform))
-        m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
+    // affect the water
+    if (event->button() == Qt::LeftButton) {
+        glm::vec3 hit;
+        if (m_camera->CastRayAtObject(&hit, m_water_transform))
+        {
+            glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
+            m_water->applyImpulseAt(CLICK_IMPULSE,
+                                    glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+        }
+    }
+    // throw a sphere in the direction you are looking
+    if (event->button() == Qt::RightButton) {
+        float force = 0.3f;
+        addSphere(glm::vec3(m_camera->eye), .05, glm::vec3(-force * glm::vec4(m_camera->w, 0.0f)), 1);
+    }
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
@@ -209,8 +223,13 @@ void View::mouseMoveEvent(QMouseEvent *event)
     m_camera->MouseMoved(deltaX, deltaY);
     if (event->buttons() == Qt::LeftButton) {
         glm::vec3 hit;
-        if (m_camera->CastRayAtObject(&hit, m_water_transform))
-            m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
+
+		if (m_camera->CastRayAtObject(&hit, m_water_transform))
+		{
+			glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
+			m_water->applyImpulseAt(CLICK_IMPULSE,
+									glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+		}
     }
 }
 
@@ -229,6 +248,8 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) QApplication::quit();
 
     // TODO: Handle keyboard presses here
+	if(KEYPRESS_FOR_TICK)
+		m_world->tick(DEFAULT_TICK_LENGTH);
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
@@ -241,20 +262,22 @@ void View::tick()
     float seconds = time.restart() * 0.001f;
 
 	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
-		(*it)->applyForceAt(GRAVITY, glm::vec3());
+		(*it)->applyForceAt(GRAVITY * (*it)->m_mass, glm::vec3());
 
     // TODO: Implement the demo update here
-	m_world->tick(seconds);
+	if(!KEYPRESS_FOR_TICK)
+		m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
 }
 
-void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity)
+void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity, float buoyancy)
 {
 	SphereEntity *temp = new SphereEntity(worldLocation, radius);
 
 	temp->m_velocity = velocity;
+	temp->m_buoyancy = buoyancy;
 	m_sphere_entities.push_back(temp);
 	m_world->addEntity(temp);
 }

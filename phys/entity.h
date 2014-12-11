@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include "glm.hpp"
+#include "settings.h"
 
 class SphereEntity;
 class WaterSurface;
@@ -22,6 +23,10 @@ public:
 	virtual void applyForceAt(glm::vec3 force, glm::vec3 location) = 0;
 
 	virtual void tick(float secondsSinceLastTick) = 0;
+	virtual void post()
+	{
+
+	}
 
 protected:
 	virtual void collideWithSphere(SphereEntity *other) = 0;

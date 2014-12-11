@@ -3,12 +3,10 @@
 
 #include "entity.h"
 
-#define SphereEntity_MASS (10)
-#define SphereEntity_COR (.2)
-
 class SphereEntity : public Entity
 {
 friend class WaterSurface;
+friend class View;
 
 public:
 	SphereEntity(glm::vec3 worldLocation, float radius);
@@ -36,6 +34,7 @@ protected:
 	float m_radius;
 	float m_mass;
 	float m_cor;
+	float m_buoyancy;
 
 	glm::vec3 impulsesThisTick;
 	glm::vec3 forcesThisTick;

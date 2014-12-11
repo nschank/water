@@ -38,7 +38,7 @@ CubeMap::CubeMap(Camera* cam) {
   glEnableVertexAttribArray(vertex);
   glVertexAttribPointer(vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  float size = 5.0f;
+  float size = 0.5f;
 
   GLfloat skyboxVertices[] = {
     // Positions          
@@ -113,7 +113,7 @@ void CubeMap::draw() {
   glDisable(GL_DEPTH_TEST);
   glDepthMask(GL_FALSE);
   glUseProgram(cubemapShader);
-  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "model"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::vec3(camera->getEye()))));
+  glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4x4(1.0)));
   glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "view"), 1, GL_FALSE, glm::value_ptr(camera->getViewMatrix()));
   glUniformMatrix4fv(glGetUniformLocation(cubemapShader, "projection"), 1, GL_FALSE, glm::value_ptr(camera->getProjectionMatrix()));
   glBindVertexArray(vao);
