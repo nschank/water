@@ -6,7 +6,7 @@
 //Controls
 #define CLICK_IMPULSE (glm::vec3(0,-.2,0))
 #define DEFAULT_TICK_LENGTH (1.f/60.f)
-#define KEYPRESS_FOR_TICK false
+#define KEYPRESS_FOR_TICK (false)
 
 //Camera Settings
 #define FAR_PLANE 3.f
@@ -14,7 +14,8 @@
 #define NEAR_PLANE 0.001f
 //  different types of default camera placements
 //  default is looking directly down upon the water
-#define LOOK_SETTING_ACROSS false
+#define LOOK_SETTING_ACROSS true
+#define QTCREATOR_PLEASE_COMPILE_YOU_ASSHOLE .0005f
 
 //Render Settings
 #define POLYGON_MODE true

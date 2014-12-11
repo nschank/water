@@ -102,7 +102,6 @@ void WaterSurface::ApplyImpulses(float secondsSinceLastTick)
 	{
 		glm::vec3 impulse = m_impulses.at(i);
 		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;//*secondsSinceLastTick;
-		std::cout << impulse.y << std::endl;
 	}
 	m_impulses.clear();
 }

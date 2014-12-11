@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "common.h"
+#include "settings.h"
 
 class Camera
 {

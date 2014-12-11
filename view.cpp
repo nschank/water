@@ -42,6 +42,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	m_world = new World();
 
 	addSphere(glm::vec3(0,.3,0), .03, glm::vec3(0,0,0));
+	addSphere(glm::vec3(0,.5,-.0001), .03, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -159,16 +160,13 @@ void View::paintGL()
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
-	glUseProgram(0);
 
 	glUseProgram(m_water_shader);
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
-	//m_water->GenVertsFromHeight();
-	//glBindVertexArray(m_water->m_vao);
 	m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
-	//glBindVertexArray(0);
+	glUseProgram(0);
 }
 
 

@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "settings.h"
 
 Camera::Camera(int px_w, int px_h)
 {
@@ -211,9 +210,12 @@ void Camera::MouseMoved(int dx, int dy) {
 }
 
 void Camera::MouseScrolled(int units) {
-    float factor = 1.0/1200.0f;
-    //glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
-    translate(factor * float(units) * glm::vec4(-w, 1.0f));
+	//glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
+	float f = QTCREATOR_PLEASE_COMPILE_YOU_ASSHOLE;
+	f *= -1;
+	f *= float(units);
+
+	translate(f * glm::vec4(w,0));
     //orientLook(m_eye, -glm::vec4(m_w, 0.0f), m_up);
 
 }
