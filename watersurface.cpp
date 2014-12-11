@@ -12,18 +12,13 @@ WaterSurface::WaterSurface(GLuint shader, int subdivs)
 
     InitializeHeights();
 
-    GenVertsFromHeight();
-
-
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
     glGenBuffers(1, &m_vbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3*m_total_verts*sizeof(GLfloat), m_verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
     glEnableVertexAttribArray(glGetAttribLocation(shader, "position"));
-
     glVertexAttribPointer(
                 glGetAttribLocation(shader, "position"),
                 3,
@@ -35,6 +30,8 @@ WaterSurface::WaterSurface(GLuint shader, int subdivs)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+	GenVertsFromHeight();
 }
 
 
@@ -45,10 +42,12 @@ WaterSurface::~WaterSurface() {
 }
 
 void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
-    //glBindVertexArray(m_vao);
+	GenVertsFromHeight();
+
+	glBindVertexArray(m_vao);
     glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(mat));
     glDrawArrays(GL_TRIANGLES, 0, m_total_verts);
-    //glBindVertexArray(0);
+	glBindVertexArray(0);
 }
 
 void WaterSurface::InitializeHeights() {
@@ -65,13 +64,12 @@ void WaterSurface::InitializeHeights() {
 
 // really update velocities
 void WaterSurface::UpdateHeights() {
-	float damping = 0.95;
 	// iterate over non edge components
 	for(int i=1; i<m_subdivs; i++) {
 		for(int j=1; j<m_subdivs;j++) {
 			m_vel[i*(m_subdivs+1) + j] = glm::clamp(((m_height[(i+1)*(m_subdivs+1) + j] + m_height[(i-1)*(m_subdivs+1) + j] +
-					m_height[i*(m_subdivs+1) + (j+1)] + m_height[i*(m_subdivs+1) + (j-1)])/2.0
-					- m_vel[i*(m_subdivs+1) + j]) * damping, -.5, .5);
+					m_height[i*(m_subdivs+1) + (j+1)] + m_height[i*(m_subdivs+1) + (j-1)])/VELOCITY_AVERAGE_FACTOR
+					- m_vel[i*(m_subdivs+1) + j]) * VELOCITY_DAMPING_FACTOR, MINIMUM_VELOCITY, MAXIMUM_VELOCITY);
 			//m_vel[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
 		}
 	}
@@ -104,7 +102,9 @@ void WaterSurface::ApplyImpulses(float secondsSinceLastTick)
 	{
 		glm::vec3 impulse = m_impulses.at(i);
 		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;//*secondsSinceLastTick;
+		std::cout << impulse.y << std::endl;
 	}
+	m_impulses.clear();
 }
 
 void WaterSurface::setPoints(bool clear)
@@ -140,14 +140,12 @@ void WaterSurface::GenVertsFromHeight() {
     float sx = -0.5;
     float sz = -0.5;
 
-    float MAX_HEIGHT = 0.5f;
-
     for (int i=0; i < m_subdivs; i++) {
         for (int j=0; j < m_subdivs; j++) {
             // triangle 1
             // v1
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j], MAX_HEIGHT);
+			m_verts[m++] = m_height[i*(m_subdivs+1) + j];
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -155,14 +153,14 @@ void WaterSurface::GenVertsFromHeight() {
 
             // v2
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j+1], MAX_HEIGHT);
+			m_verts[m++] = m_height[i*(m_subdivs+1) + j+1];
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
             //m_verts[m++] = nz;
             // v3
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
+			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j+1];
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -170,14 +168,14 @@ void WaterSurface::GenVertsFromHeight() {
             // triangle 2
             // v4
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_height[i*(m_subdivs+1) + j], MAX_HEIGHT);
+			m_verts[m++] = m_height[i*(m_subdivs+1) + j];
             m_verts[m++] = sz + (ss * i);
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
             //m_verts[m++] = nz;
             // v5
             m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j+1], MAX_HEIGHT);
+			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j+1];
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -185,7 +183,7 @@ void WaterSurface::GenVertsFromHeight() {
 
             //v6
             m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = glm::min(m_height[(i+1)*(m_subdivs+1) + j], MAX_HEIGHT);
+			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j];
             m_verts[m++] = sz + (ss * (i+1));
             //m_verts[m++] = nx;
             //m_verts[m++] = ny;
@@ -193,8 +191,7 @@ void WaterSurface::GenVertsFromHeight() {
         }
     }
     m_total_verts = m/3;
-    glBindVertexArray(m_vao);
-    //glGenBuffers(1, &m_vbo);
+	glBindVertexArray(m_vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 3*m_total_verts*sizeof(GLfloat), m_verts, GL_DYNAMIC_DRAW);
@@ -251,19 +248,9 @@ float& WaterSurface::velocityAt(glm::vec2 discretePoint)
 	return m_vel[(int)glm::round(discretePoint.y)*(m_subdivs+1) + (int)glm::round(discretePoint.x)];
 }
 
-float WaterSurface::getXResolution()
+float WaterSurface::getResolution()
 {
 	return 1/float(m_subdivs);
-}
-
-float WaterSurface::getYResolution()
-{
-	return 1/float(m_subdivs);
-}
-
-float WaterSurface::getMaxHeight()
-{
-	return .5;
 }
 
 void WaterSurface::post()

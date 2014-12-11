@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include "glm.hpp"
+#include "settings.h"
 
 class SphereEntity;
 class WaterSurface;

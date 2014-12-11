@@ -4,9 +4,8 @@
 
 #include "lib/ResourceLoader.h"
 #include "sphereentity.h"
-
-#define GRAVITY (glm::vec3(0,-9.8,0))
-#define USE_TICK true
+#include "settings.h"
+#include <iostream>
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -24,20 +23,20 @@ View::View(QWidget *parent) : QGLWidget(parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     // ambient and diffuse coefficients
-    m_k_a = 0.2f;
-    m_k_d = 0.8f;
+	m_k_a = GLOBAL_AMBIENT_COEFFICIENT;
+	m_k_d = GLOBAL_DIFFUSE_COEFFICIENT;
     // ambient intensity
-    m_i_a = glm::vec3(0.25, 0.25, 0.25);
+	m_i_a = GLOBAL_AMBIENT_INTENSITY;
 
     // object ambient color
-    m_object_a = glm::vec3(1.0, 0.6, 0.6);
+	m_object_a = SPHERE_AMBIENT_COLOR;
     // object diffuse color
-    m_object_d = glm::vec3(1.0, 0.2, 0.2);
+	m_object_d = SPHERE_DIFFUSE_COLOR;
 
     // water ambient and diffuse colors
-    m_water_a = glm::vec3(0.0, 0.8, 1.0);
-    // object diffuse color
-    m_water_d = glm::vec3(0.0, 0.6, 1.0);
+	m_water_a = WATER_AMBIENT_COLOR;
+	// water diffuse color
+	m_water_d = WATER_DIFFUSE_COLOR;
 
 	//create a World for Entities to live in
 	m_world = new World();
@@ -71,10 +70,7 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
-    glEnable(GL_DEPTH_TEST);
-
-
-    m_object_shader = ResourceLoader::loadShaders(
+	m_object_shader = ResourceLoader::loadShaders(
             "shaders/default.vert",
             "shaders/default.frag");
 
@@ -86,19 +82,18 @@ void View::initializeGL()
     m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
     m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
 
-
-
     m_camera = new Camera(width(), height());
 
-    m_sphere = new Sphere(m_object_shader, 30);
-	m_water = new WaterSurface(m_water_shader, 500);
+	m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
+	m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
     std::vector<glm::mat3> normal_matrices;
 
 	//glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if(POLYGON_MODE)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
@@ -132,7 +127,8 @@ void View::paintGL()
     glViewport(0, 0, width(), height());
 
     // Render the scene.
-	cubeMap->draw();
+	if(USE_CUBE_MAP)
+		cubeMap->draw();
 
     glUseProgram(m_object_shader);
 
@@ -165,15 +161,14 @@ void View::paintGL()
 	glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
 	glUseProgram(0);
 
-
 	glUseProgram(m_water_shader);
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
 	glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
-	m_water->GenVertsFromHeight();
-	glBindVertexArray(m_water->m_vao);
+	//m_water->GenVertsFromHeight();
+	//glBindVertexArray(m_water->m_vao);
 	m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 }
 
 
@@ -186,7 +181,11 @@ void View::mousePressEvent(QMouseEvent *event)
 {
     glm::vec3 hit;
     if (m_camera->CastRayAtObject(&hit, m_water_transform))
-        m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
+	{
+		glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
+		m_water->applyImpulseAt(CLICK_IMPULSE,
+								glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+	}
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
@@ -207,8 +206,12 @@ void View::mouseMoveEvent(QMouseEvent *event)
     m_camera->MouseMoved(deltaX, deltaY);
     if (event->buttons() == Qt::LeftButton) {
         glm::vec3 hit;
-        if (m_camera->CastRayAtObject(&hit, m_water_transform))
-			m_water->applyImpulseAt(glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(hit.x, 0.0f, hit.z));
+		if (m_camera->CastRayAtObject(&hit, m_water_transform))
+		{
+			glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
+			m_water->applyImpulseAt(CLICK_IMPULSE,
+									glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+		}
     }
 }
 
@@ -227,7 +230,8 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) QApplication::quit();
 
     // TODO: Handle keyboard presses here
-
+	if(KEYPRESS_FOR_TICK)
+		m_world->tick(DEFAULT_TICK_LENGTH);
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
@@ -243,7 +247,7 @@ void View::tick()
 		(*it)->applyForceAt(GRAVITY, glm::vec3());
 
     // TODO: Implement the demo update here
-	if(USE_TICK)
+	if(!KEYPRESS_FOR_TICK)
 		m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)

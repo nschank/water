@@ -57,15 +57,15 @@ void SphereEntity::collideWithSphere(SphereEntity *other)
 
 void SphereEntity::collideWithSurface(WaterSurface *surface)
 {
-	if(m_center.y - m_radius > surface->getMaxHeight()) //ball is too high up
+	if(m_center.y - m_radius > MAXIMUM_VELOCITY) //ball is too high up
 		return;
 
 	//the number of points necessary to hold up this ball precisely
 	const float maximumArea = M_PI * m_radius * m_radius;
 	const float requiredArea = (m_buoyancy/MAX_BUOYANCY) * maximumArea;
 
-	glm::vec2 upperLeft = surface->closestDiscretePoint(m_center - glm::vec3(m_radius+surface->getXResolution()));
-	glm::vec2 lowerRight = surface->closestDiscretePoint(m_center + glm::vec3(m_radius+surface->getXResolution()));
+	glm::vec2 upperLeft = surface->closestDiscretePoint(m_center - glm::vec3(m_radius+surface->getResolution()));
+	glm::vec2 lowerRight = surface->closestDiscretePoint(m_center + glm::vec3(m_radius+surface->getResolution()));
 
 	int supportingPoints = 0;
 	float diff = 0;
@@ -75,12 +75,12 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 	//x2+y2+z2=r2
 	for(int x_i = (int)upperLeft.x; x_i <= (int)lowerRight.x; x_i++)
 	{
-		const float x = -.5f + x_i*surface->getXResolution();
+		const float x = -.5f + x_i*surface->getResolution();
 		const float x_dist = (x - m_center.x)*(x - m_center.x);
 
 		for(int z_i = (int)upperLeft.y; z_i <= (int)lowerRight.y; z_i++)
 		{
-			float z = -.5f + z_i*surface->getYResolution();
+			float z = -.5f + z_i*surface->getResolution();
 			float y = surface->heightAt(glm::vec2(x_i,z_i));
 			float y_dist = m_center.y > y ? (y - m_center.y)*(y - m_center.y) : 0;
 			float z_dist = (z - m_center.z)*(z - m_center.z);

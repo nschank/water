@@ -31,7 +31,8 @@ HEADERS += mainwindow.h \
     cubemap.h \
     phys/world.h \
     phys/entity.h \
-    phys/sphereentity.h
+    phys/sphereentity.h \
+    settings.h
 
 FORMS += mainwindow.ui
 

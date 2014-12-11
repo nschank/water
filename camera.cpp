@@ -6,9 +6,9 @@ Camera::Camera(int px_w, int px_h)
     setClip(1.0f, 30.0f);
       setHeightAngle(60.0f);
       setAspectRatio(1.0f);
-	  orientLook(glm::vec4(1.0f, .05f, 0.0f, 1.0f),
-				 glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
-				 glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+	  orientLook(glm::vec4(-1.0f, .05f, 0.0f, 1.0f),
+				 glm::vec4(1.0f, 0.0f, 0.0f, 0),
+				 glm::vec4(0.0f, 1.0f, 0.0f, 0));
 
 }
 
@@ -175,13 +175,12 @@ glm::vec4 Camera::getEye() {
 }
 
 bool Camera::CastRayAtObject(glm::vec3 *hit, glm::mat4x4 model) {
-    glm::mat4x4 inv = glm::inverse(model);
-    glm::vec4 model_dir = inv*(glm::vec4(-w, 1.0f));
-    glm::vec4 model_eye = inv*eye;
+	glm::vec3 model_dir = glm::mat3(glm::transpose(glm::inverse(model)))*-1.f*w;
+	glm::vec4 model_eye = glm::inverse(model)*eye;
 
-    float t = (0.5 - model_eye.y)/model_dir.y;
+	float t = - model_eye.y/model_dir.y;
 
-    *hit = glm::vec3(model_dir*t + model_eye);
+	*hit = model_dir*t + glm::vec3(model_eye);
 
     bool on_face = (hit->x >= -0.5 && hit->x <= 0.5 &&
                     hit->z >= -0.5 && hit->z <= 0.5);
