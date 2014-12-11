@@ -6,6 +6,7 @@
 class SphereEntity : public Entity
 {
 friend class WaterSurface;
+friend class View;
 
 public:
 	SphereEntity(glm::vec3 worldLocation, float radius);

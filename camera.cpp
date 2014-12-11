@@ -8,8 +8,8 @@ Camera::Camera(int px_w, int px_h)
 	  setHeightAngle(HEIGHT_ANGLE);
       setAspectRatio(1.0f);
 	if(LOOK_SETTING_ACROSS)
-		orientLook(glm::vec4(-1.0f, .05f, 0.0f, 1.0f),
-				 glm::vec4(1.0f, 0.0f, 0.0f, 0),
+		orientLook(glm::vec4(0.f, .15f, 1.0f, 1.0f),
+				 glm::vec4(0.0f, 0.0f, -1.0f, 0),
 				 glm::vec4(0.0f, 1.0f, 0.0f, 0));
 	else
 		orientLook(glm::vec4(0.0f, .5f, 0.0f, 1.0f),
@@ -211,7 +211,7 @@ void Camera::MouseMoved(int dx, int dy) {
 
 void Camera::MouseScrolled(int units) {
 	//glm::mat4x4 transform = glm::translate(-factor * float(units) * look);
-	float f = QTCREATOR_PLEASE_COMPILE_YOU_ASSHOLE;
+	float f = SCROLL_TICK;
 	f *= -1;
 	f *= float(units);
 

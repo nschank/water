@@ -41,9 +41,13 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
-	addSphere(glm::vec3(0,.3,0), .03, glm::vec3(0,0,0));
-	addSphere(glm::vec3(0,.5,-.0001), .03, glm::vec3(0,0,0));
+	addSphere(glm::vec3(-.4,.3,0), .05, glm::vec3(0,0,0), 1);
+	addSphere(glm::vec3(-.2,.3,0), .05, glm::vec3(0,0,0), 15);
+	addSphere(glm::vec3(0,.3,0), .05, glm::vec3(0,0,0), 30);
+	addSphere(glm::vec3(.2,.3,0), .05, glm::vec3(0,0,0), 45);
+	addSphere(glm::vec3(.4,.3,0), .05, glm::vec3(0,0,0), 60);
 }
+
 
 View::~View()
 {
@@ -242,7 +246,7 @@ void View::tick()
     float seconds = time.restart() * 0.001f;
 
 	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
-		(*it)->applyForceAt(GRAVITY, glm::vec3());
+		(*it)->applyForceAt(GRAVITY * (*it)->m_mass, glm::vec3());
 
     // TODO: Implement the demo update here
 	if(!KEYPRESS_FOR_TICK)
@@ -252,11 +256,12 @@ void View::tick()
     update();
 }
 
-void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity)
+void View::addSphere(glm::vec3 worldLocation, float radius, glm::vec3 velocity, float buoyancy)
 {
 	SphereEntity *temp = new SphereEntity(worldLocation, radius);
 
 	temp->m_velocity = velocity;
+	temp->m_buoyancy = buoyancy;
 	m_sphere_entities.push_back(temp);
 	m_world->addEntity(temp);
 }

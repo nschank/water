@@ -96,12 +96,12 @@ void WaterSurface::UpdateHeights() {
     }
 }*/
 
-void WaterSurface::ApplyImpulses(float secondsSinceLastTick)
+void WaterSurface::ApplyImpulses()
 {
 	for (int i=0; i<m_impulses.size(); i++)
 	{
 		glm::vec3 impulse = m_impulses.at(i);
-		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;//*secondsSinceLastTick;
+		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;
 	}
 	m_impulses.clear();
 }
@@ -116,6 +116,7 @@ void WaterSurface::setPoints(bool clear)
 	}
 	if(clear)
 		m_setPoints.clear();
+
 }
 
 void WaterSurface::setPoint(glm::vec2 discretePoint, float height)
@@ -217,8 +218,6 @@ void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
 void WaterSurface::tick(float secondsSinceLastTick)
 {
 	setPoints(true);
-	ApplyImpulses(secondsSinceLastTick);
-	UpdateHeights();
 }
 
 void WaterSurface::collideWith(Entity *other)
@@ -254,5 +253,7 @@ float WaterSurface::getResolution()
 
 void WaterSurface::post()
 {
+	ApplyImpulses();
+	UpdateHeights();
 	setPoints(false);
 }

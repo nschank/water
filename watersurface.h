@@ -34,7 +34,7 @@ protected:
 
 	float getResolution();
 
-	void ApplyImpulses(float secondsSinceLastTick);
+	void ApplyImpulses();
 	void setPoints(bool clear);
 	void UpdateHeights();
 
