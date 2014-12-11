@@ -156,8 +156,10 @@ glm::vec3 WaterSurface::ComputeNormal(int i, int j) {
 
     glm::vec2 step(1.0, 0);
 
-    glm::vec3 va = glm::normalize(glm::vec3(1.0f, 0.0f, 200*(up - down)));
-    glm::vec3 vb = glm::normalize(glm::vec3(0.0f, 1.0f, 200*(left - right)));
+    float n1 = sqrt(1 + pow(200*(up - down), 2));
+    float n2 = sqrt(1 + pow(200*(left - right), 2));
+    glm::vec3 va = glm::vec3(1.0f/n1, 0.0f, 200*(up - down) / n1);
+    glm::vec3 vb = glm::vec3(0.0f, 1.0f/n2, 200*(left - right) / n2);
 
     glm::vec3 norm = glm::normalize(glm::cross(va, vb));
     //glm::vec3 norm = glm::vec3(0.0f, 1.0f, 0.0f);
