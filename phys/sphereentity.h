@@ -3,10 +3,6 @@
 
 #include "entity.h"
 
-#define SphereEntity_MASS (90)
-#define SphereEntity_COR (.2)
-#define SPHERE_BUOYANCY (90)
-
 class SphereEntity : public Entity
 {
 friend class WaterSurface;

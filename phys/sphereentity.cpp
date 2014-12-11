@@ -3,12 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 
-#define FPS (60)
-#define MAX_BUOYANCY (100)
-#define BUOYANCY_COEFFICIENT (500.f)
-
 SphereEntity::SphereEntity(glm::vec3 worldLocation, float radius) :
-	m_center(worldLocation), m_radius(radius), m_mass(SphereEntity_MASS), m_cor(SphereEntity_COR), m_buoyancy(SPHERE_BUOYANCY)
+	m_center(worldLocation), m_radius(radius), m_mass(SPHERE_MASS), m_cor(SPHERE_COR), m_buoyancy(SPHERE_BUOYANCY)
 {
 	this->updateMatrices();
 }

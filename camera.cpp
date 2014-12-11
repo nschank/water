@@ -1,15 +1,21 @@
 #include "camera.h"
+#include "settings.h"
+
 Camera::Camera(int px_w, int px_h)
 {
     m_px_w = px_w;
     m_px_h = px_h;
-    setClip(1.0f, 30.0f);
-      setHeightAngle(60.0f);
+	setClip(NEAR_PLANE, FAR_PLANE);
+	  setHeightAngle(HEIGHT_ANGLE);
       setAspectRatio(1.0f);
-	  orientLook(glm::vec4(-1.0f, .05f, 0.0f, 1.0f),
+	if(LOOK_SETTING_ACROSS)
+		orientLook(glm::vec4(-1.0f, .05f, 0.0f, 1.0f),
 				 glm::vec4(1.0f, 0.0f, 0.0f, 0),
 				 glm::vec4(0.0f, 1.0f, 0.0f, 0));
-
+	else
+		orientLook(glm::vec4(0.0f, .5f, 0.0f, 1.0f),
+				   glm::vec4(0.0f, -1.0f, 0.0f, 0),
+				   glm::vec4(1.0f, 0.0f, 0.0f, 0));
 }
 
 void Camera::setAspectRatio(float a)
