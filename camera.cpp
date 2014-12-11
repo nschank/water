@@ -6,9 +6,9 @@ Camera::Camera(int px_w, int px_h)
     setClip(1.0f, 30.0f);
       setHeightAngle(60.0f);
       setAspectRatio(1.0f);
-      orientLook(glm::vec4(0.0f, 3.0f, 0.0f, 1.0f),
-                 glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-                 glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
+	  orientLook(glm::vec4(1.0f, .05f, 0.0f, 1.0f),
+				 glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
+				 glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 
 }
 

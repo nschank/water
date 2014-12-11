@@ -6,6 +6,7 @@
 #include "sphereentity.h"
 
 #define GRAVITY (glm::vec3(0,-9.8,0))
+#define USE_TICK true
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -41,7 +42,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
-	addSphere(glm::vec3(0,2.5,0), .03, glm::vec3(0,0,0));
+	addSphere(glm::vec3(0,.3,0), .03, glm::vec3(0,0,0));
 }
 
 View::~View()
@@ -90,14 +91,14 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
     m_sphere = new Sphere(m_object_shader, 30);
-	m_water = new WaterSurface(m_water_shader, 100);
+	m_water = new WaterSurface(m_water_shader, 500);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
     std::vector<glm::mat3> normal_matrices;
 
 	//glEnable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
@@ -226,6 +227,7 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) QApplication::quit();
 
     // TODO: Handle keyboard presses here
+
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
@@ -241,7 +243,8 @@ void View::tick()
 		(*it)->applyForceAt(GRAVITY, glm::vec3());
 
     // TODO: Implement the demo update here
-	m_world->tick(seconds);
+	if(USE_TICK)
+		m_world->tick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();

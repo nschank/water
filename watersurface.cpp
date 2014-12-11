@@ -65,24 +65,17 @@ void WaterSurface::InitializeHeights() {
 
 // really update velocities
 void WaterSurface::UpdateHeights() {
-    int ind, i, j;
-    float damping = 0.95;
-    // iterate over non edge components
-    for (i=1; i<m_subdivs; i++) {
-        for (j=1; j<m_subdivs;j++) {
-            for (i=1; i<m_subdivs; i++) {
-                    for (j=1; j<m_subdivs;j++) {
-                        m_vel[i*(m_subdivs+1) + j] = ((m_height[(i+1)*(m_subdivs+1) + j] +
-                                                      m_height[(i-1)*(m_subdivs+1) + j] +
-                                                      m_height[i*(m_subdivs+1) + (j+1)] +
-                                                      m_height[i*(m_subdivs+1) + (j-1)])/2.0 - m_vel[i*(m_subdivs+1) + j]) * damping;
-                        //m_vel[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
-                    }
-                }
-                std::swap(m_vel, m_height);
-        }
-    }
-    //std::swap(m_vel, m_height);
+	float damping = 0.95;
+	// iterate over non edge components
+	for(int i=1; i<m_subdivs; i++) {
+		for(int j=1; j<m_subdivs;j++) {
+			m_vel[i*(m_subdivs+1) + j] = glm::clamp(((m_height[(i+1)*(m_subdivs+1) + j] + m_height[(i-1)*(m_subdivs+1) + j] +
+					m_height[i*(m_subdivs+1) + (j+1)] + m_height[i*(m_subdivs+1) + (j-1)])/2.0
+					- m_vel[i*(m_subdivs+1) + j]) * damping, -.5, .5);
+			//m_vel[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
+		}
+	}
+	std::swap(m_vel, m_height);
 }
 
 /*void WaterSurface::UpdateNormals() {
@@ -105,42 +98,40 @@ void WaterSurface::UpdateHeights() {
     }
 }*/
 
-void WaterSurface::ApplyImpulses() {
-    for (int i=0; i<m_impulses.size(); i++) {
-        glm::vec3 impulse = m_impulses.at(i);
-        int closest_x, closest_y;
-		closest_x = glm::max(1, glm::min(m_subdivs-1, int(((impulse.x + 0.5) / 1.0)*m_subdivs)));
-		closest_y = glm::max(1, glm::min(m_subdivs-1, int(((impulse.z + 0.5) / 1.0)*m_subdivs)));
-        m_vel[closest_y*(m_subdivs + 1) + closest_x] += impulse.y;
-		m_vel[(closest_y+1)*(m_subdivs + 1) + (closest_x+1)] += impulse.y/2.f;
-		m_vel[(closest_y+1)*(m_subdivs + 1) + (closest_x-1)] += impulse.y/2.f;
-		m_vel[(closest_y-1)*(m_subdivs + 1) + (closest_x+1)] += impulse.y/2.f;
-		m_vel[(closest_y-1)*(m_subdivs + 1) + (closest_x-1)] += impulse.y/2.f;
-    }
-    m_impulses.clear();
+void WaterSurface::ApplyImpulses(float secondsSinceLastTick)
+{
+	for (int i=0; i<m_impulses.size(); i++)
+	{
+		glm::vec3 impulse = m_impulses.at(i);
+		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;//*secondsSinceLastTick;
+	}
 }
 
-void WaterSurface::ApplyImpulseRadius(glm::vec3 impulse, float rad) {
-    int closest_x, closest_y;
-
-    closest_x = glm::max(0, glm::min(m_subdivs, int(((impulse.x + 0.5) / 1.0)*m_subdivs)));
-    closest_y = glm::max(0, glm::min(m_subdivs, int(((impulse.z + 0.5) / 1.0)*m_subdivs)));
-
-    int min_x = glm::max(0, glm::min(m_subdivs, int(closest_x - rad))),
-        max_x = glm::max(0, glm::min(m_subdivs, int(closest_x + rad))),
-        min_y = glm::max(0, glm::min(m_subdivs, int(closest_y - rad))),
-        max_y = glm::max(0, glm::min(m_subdivs, int(closest_y + rad)));
-
-    for (int i=min_y; i<=max_y; i++) {
-        for (int j=min_x; j<=max_x; j++) {
-            m_vel[i*(m_subdivs+1) + j] = glm::min(m_vel[i*(m_subdivs+1)+j] + 0.5, 0.5);
-        }
-    }
+void WaterSurface::setPoints(bool clear)
+{
+	for(int i = 0; i < m_setPoints.size(); i++)
+	{
+		glm::vec3 point = m_setPoints.at(i);
+		m_setPoints.at(i).y = heightAt(glm::vec2(point.x,point.z));
+		heightAt(glm::vec2(point.x,point.z)) = point.y;
+	}
+	if(clear)
+		m_setPoints.clear();
 }
 
-void WaterSurface::AddImpulse(glm::vec3 impulse) {
-
+void WaterSurface::setPoint(glm::vec2 discretePoint, float height)
+{
+	m_setPoints.push_back(glm::vec3(discretePoint.x,height,discretePoint.y));
 }
+
+glm::vec2 WaterSurface::closestDiscretePoint(glm::vec3 continuousPoint)
+{
+	int closest_x = glm::max(1, glm::min(m_subdivs-1, (int)glm::round((((continuousPoint.x + 0.5) / 1.0)*m_subdivs))));
+	int closest_y = glm::max(1, glm::min(m_subdivs-1, (int)glm::round((((continuousPoint.z + 0.5) / 1.0)*m_subdivs))));
+
+	return glm::vec2(closest_x, closest_y);
+}
+
 
 
 void WaterSurface::GenVertsFromHeight() {
@@ -229,7 +220,8 @@ void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)
 
 void WaterSurface::tick(float secondsSinceLastTick)
 {
-	ApplyImpulses();
+	setPoints(true);
+	ApplyImpulses(secondsSinceLastTick);
 	UpdateHeights();
 }
 
@@ -249,11 +241,14 @@ void WaterSurface::collideWithSurface(WaterSurface *other)
 	//does nothing
 }
 
-float WaterSurface::heightAt(float x, float y)
+float& WaterSurface::heightAt(glm::vec2 discretePoint)
 {
-	int closest_x = glm::max(0, glm::min(m_subdivs, int(((x + 0.5) / 1.0)*m_subdivs)));
-	int closest_y = glm::max(0, glm::min(m_subdivs, int(((y + 0.5) / 1.0)*m_subdivs)));
-	return m_height[closest_y*(m_subdivs+1) + closest_x];
+	return m_height[(int)glm::round(discretePoint.y)*(m_subdivs+1) + (int)glm::round(discretePoint.x)];
+}
+
+float& WaterSurface::velocityAt(glm::vec2 discretePoint)
+{
+	return m_vel[(int)glm::round(discretePoint.y)*(m_subdivs+1) + (int)glm::round(discretePoint.x)];
 }
 
 float WaterSurface::getXResolution()
@@ -269,4 +264,9 @@ float WaterSurface::getYResolution()
 float WaterSurface::getMaxHeight()
 {
 	return .5;
+}
+
+void WaterSurface::post()
+{
+	setPoints(false);
 }

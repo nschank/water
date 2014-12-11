@@ -18,20 +18,23 @@ public:
     void InitializeHeights();
 
     void UpdateHeights();
+	void post();
 
     //void UpdateNormals();
 
-    void ApplyImpulses();
+	void setPoints(bool clear);
+	void ApplyImpulses(float secondsSinceLastTick);
 
-    void ApplyImpulseRadius(glm::vec3 impulse, float rad);
+	void setPoint(glm::vec2 discretePoint, float height);
 
-    void AddImpulse(glm::vec3 impulse);
+	glm::vec2 closestDiscretePoint(glm::vec3 continuousPoint);
 
     void Draw(glm::mat4x4 mat, GLuint model);
 
     GLuint m_vao, m_vbo;
 
     std::vector<glm::vec3> m_impulses;
+	std::vector<glm::vec3> m_setPoints;
 
 	void collideWith(Entity *other);
 
@@ -44,7 +47,8 @@ protected:
 	void collideWithSphere(SphereEntity *other);
 	void collideWithSurface(WaterSurface *other);
 
-	float heightAt(float x, float y);
+	float& heightAt(glm::vec2 discretePoint);
+	float& velocityAt(glm::vec2 discretePoint);
 	float getXResolution();
 	float getYResolution();
 
@@ -57,7 +61,6 @@ private:
     float *m_vel, *m_height;
 
     glm::vec3 *m_normals;
-
 
 
 };

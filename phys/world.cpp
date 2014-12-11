@@ -17,7 +17,8 @@ void World::addEntity(Entity *newEntity)
 
 void World::tick(float secondsSinceLastTick)
 {
-
+	for(std::vector<Entity *>::const_iterator it = m_entities.begin(); it != m_entities.end(); it++)
+		(*it)->tick(secondsSinceLastTick);
 
 	for(int i = 0; i < m_entities.size(); i++)
 	{
@@ -30,6 +31,5 @@ void World::tick(float secondsSinceLastTick)
 	}
 
 	for(std::vector<Entity *>::const_iterator it = m_entities.begin(); it != m_entities.end(); it++)
-		(*it)->tick(secondsSinceLastTick);
-
+		(*it)->post();
 }
