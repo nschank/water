@@ -59,7 +59,8 @@ void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
 
 	glBindVertexArray(m_vao);
     glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(mat));
-    glDrawArrays(GL_TRIANGLES, 0, m_total_verts);
+	for(int i = 0; i <= m_subdivs; i++)
+		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs+1), m_total_verts/m_subdivs);
 	glBindVertexArray(0);
 }
 
@@ -166,7 +167,7 @@ glm::vec3 WaterSurface::ComputeNormal(int i, int j) {
     //if (i == 100 && j == 100)
     //    printf("%f %f %f\n", norm.x, norm.y, norm.z);
 
-    return glm::vec3(norm.x, norm.z, norm.y);
+	return glm::vec3(norm.x, norm.z, norm.y);
 
 }
 
@@ -174,10 +175,10 @@ void WaterSurface::GenVertsFromHeight() {
     float ss = 1.0/m_subdivs;
     int m = 0;
     float sx = -0.5;
-    float sz = -0.5;
-    glm::vec3 norm;
-    for (int i=0; i < m_subdivs; i++) {
-        for (int j=0; j < m_subdivs; j++) {
+	float sz = -0.5;
+	glm::vec3 norm;
+	for (int i=0; i < m_subdivs; i++) {
+		for (int j=0; j <= m_subdivs; j++) {
             // triangle 1
             // v1
             m_verts[m++] = sx + (ss * j);
@@ -188,47 +189,14 @@ void WaterSurface::GenVertsFromHeight() {
             m_verts[m++] = norm.y;
             m_verts[m++] = norm.z;
 
-            // v2
-            m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = m_height[i*(m_subdivs+1) + j+1] + FUNC(i, j+1);
-            m_verts[m++] = sz + (ss * i);
-            norm = ComputeNormal(i, j+1);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
-            // v3
-            m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j+1] + FUNC(i+1, j+1);
-            m_verts[m++] = sz + (ss * (i+1));
-            norm = ComputeNormal(i+1, j+1);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
-            // triangle 2
-            // v4
-            m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = m_height[i*(m_subdivs+1) + j] + FUNC(i, j);
-            m_verts[m++] = sz + (ss * i);
-            norm = ComputeNormal(i, j);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
-            // v5
-            m_verts[m++] = sx + (ss * (j+1));
-            m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j+1] + FUNC(i+1, j+1);
-            m_verts[m++] = sz + (ss * (i+1));
-            norm = ComputeNormal(i+1, j+1);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
-            //v6
-            m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j] + FUNC(i+1, j);
-            m_verts[m++] = sz + (ss * (i+1));
-            norm = ComputeNormal(i+1, j);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
+			// v2
+			m_verts[m++] = sx + (ss * j);
+			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j] + FUNC(i+1, j);
+			m_verts[m++] = sz + (ss * (i+1));
+			norm = ComputeNormal(i+1, j);
+			m_verts[m++] = norm.x;
+			m_verts[m++] = norm.y;
+			m_verts[m++] = norm.z;
         }
     }
     m_total_verts = (m-1)/6;

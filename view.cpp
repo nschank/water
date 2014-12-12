@@ -41,11 +41,11 @@ View::View(QWidget *parent) : QGLWidget(parent)
 	//create a World for Entities to live in
 	m_world = new World();
 
-	addSphere(glm::vec3(-.4,.3,0), .05, glm::vec3(0,0,0), 1);
+	/*addSphere(glm::vec3(-.4,.3,0), .05, glm::vec3(0,0,0), 1);
 	addSphere(glm::vec3(-.2,.3,0), .05, glm::vec3(0,0,0), 15);
 	addSphere(glm::vec3(0,.3,0), .05, glm::vec3(0,0,0), 30);
 	addSphere(glm::vec3(.2,.3,0), .05, glm::vec3(0,0,0), 45);
-	addSphere(glm::vec3(.4,.3,0), .05, glm::vec3(0,0,0), 60);
+	addSphere(glm::vec3(.4,.3,0), .05, glm::vec3(0,0,0), 60);*/
 }
 
 
@@ -83,6 +83,7 @@ void View::initializeGL()
             "shaders/water.vert",
             "shaders/water.frag");
 
+
     m_uni["p"] = glGetUniformLocation(m_object_shader, "p");
     m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
     m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
@@ -90,13 +91,13 @@ void View::initializeGL()
     m_camera = new Camera(width(), height());
 
 	m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
-    m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
+	m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
 	m_world->addEntity(m_water);
     m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    std::vector<glm::mat3> normal_matrices;
+	std::vector<glm::mat3> normal_matrices;
 
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	if(POLYGON_MODE)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_DEPTH_TEST);

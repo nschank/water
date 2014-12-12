@@ -19,10 +19,10 @@
 
 
 //Render Settings
-#define POLYGON_MODE false
+#define POLYGON_MODE true
 #define SPHERE_RESOLUTION (30)
 #define USE_CUBE_MAP true
-#define WATER_RESOLUTION (200)
+#define WATER_RESOLUTION (300)
 
 //Lighting Settings
 #define GLOBAL_AMBIENT_COEFFICIENT 0.2f
