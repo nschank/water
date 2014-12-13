@@ -184,36 +184,25 @@ void View::paintGL()
     m_sphere_model_matrices[i] = current->modelMatrix();
     m_sphere_pos[i] = current->m_center;
   }
-
-  if(m_balls > 0){
+  if(ballCount > 0) {
   glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
   glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
   }
-
-  if(m_balls > 1){
+  if(ballCount > 1) {
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
   glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->normalMatrix()));
   glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->modelMatrix()));
-}
-
-  if(m_balls > 2){
-  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices2"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->normalMatrix()));
-  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels2"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->modelMatrix()));
+  }
+    if(ballCount > 2) {
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->modelMatrix()));
+    glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices2"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels2"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->modelMatrix()));
   }
 
-  if(m_balls > 3){
-  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices3"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(3)->normalMatrix()));
-  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels3"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(3)->modelMatrix()));
-  }
-
-  if(m_balls > 4){
-  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices4"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(4)->normalMatrix()));
-  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels4"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(4)->modelMatrix()));
-}
-
-  if(m_balls > 5){
-  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices5"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(5)->normalMatrix()));
-  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels5"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(5)->modelMatrix()));
-}
 
   m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
   glUseProgram(0);
