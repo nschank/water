@@ -105,6 +105,39 @@ void main() {
     intersection1 = t;
   }
   
+  float intersection2 = -1.0f;
+  vec3 ballNormal2 = vec3(0.0f);
+  mat4 ballInvModel2 = inverse(ballModels2);
+  vec4 P2 = ballInvModel2*vec4(pos, 2.0f);
+  vec4 d2 = ballInvModel2*vec4(reflectionDir, 0.0f);
+  float a2 = d2.x*d2.x + d2.y*d2.y + d2.z*d2.z,
+        b2 = 2.0f*(P2.x*d2.x + P2.y*d2.y + P2.z*d2.z),
+        c2 = P2.x*P2.x + P2.y*P2.y + P2.z*P2.z - 0.25f;
+  float disc2 = b2*b2 - 4.0f*a2*c2;
+  if(disc2 >= 0.0f) {
+    float first = (-b2 + sqrt(disc2))/(2.0f*a2),
+          second = (-b2 - sqrt(disc2))/(2.0f*a2);
+    float t = -1.0f;
+    bool firstNonNeg = false,
+         secondNonNeg = false;
+    if(first >= 0.0f) {
+      firstNonNeg = true;
+    }
+    if(second >= 0.0f) {
+      secondNonNeg = true;
+    }
+    if(firstNonNeg && first <= second) {
+      t = first;
+      vec4 objectPoint = P2 + t*d2;
+      ballNormal2 = normalize(ballNormalMatrices2*vec3(objectPoint));
+    } else if(secondNonNeg) {
+      t = second;
+      vec4 objectPoint = P2 + t*d2;
+      ballNormal2 = normalize(ballNormalMatrices2*vec3(objectPoint));
+    }
+    intersection2 = t;
+  }
+
   if((intersection0 < intersection1 && intersection0 > 0.0f) || intersection1 < 0.0f) {
     vec3 spherePos = pos + intersection0*reflectionDir;
     float d = max(0.0f, dot(ballNormal0, normalize(light - spherePos)));
