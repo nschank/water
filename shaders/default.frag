@@ -10,7 +10,7 @@ in vec3 norm;
 in mat4 view;
 in vec3 vertexToEye;
 in vec3 out_normal;
-const vec3 light = vec3(3.0f, 3.0f, 3.0f);
+const vec3 light = vec3(.5f, 1.f, .4f);
 
 void main()
 {

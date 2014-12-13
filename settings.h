@@ -8,7 +8,7 @@
 #define CLICK_IMPULSE (glm::vec3(0,-0.05,0))
 #define DEFAULT_TICK_LENGTH (1.f/60.f)
 #define KEYPRESS_FOR_TICK (false)
-#define SCROLL_TICK .0005f
+#define SCROLL_TICK .0002f
 
 //Camera Settings
 #define ASPECT_RATIO 16.f/9.f
@@ -47,7 +47,7 @@
 //Water Surface - Interactions
 #define MAX_BUOYANCY (100)
 #define SUPPORT_COEFFICIENT 30.f
-#define SUPPORTED_VELOCITY_COEFFICIENT .08f
+#define SUPPORTED_VELOCITY_COEFFICIENT .1f
 #define SURFACE_IMPULSE_COEFFICIENT .15f
 #define SURFACE_SIDEWAYS_COEFFICIENT 0.02f
 
@@ -61,7 +61,7 @@
 #define TOP_EDGE_HEIGHT .0005f
 #define VELOCITY_AVERAGE_FACTOR (2.f)
 #define VELOCITY_DAMPING_FACTOR (.993f)
-#define WATER_PLANE_HEIGHT -0.12f
+#define WATER_PLANE_HEIGHT -.12f
 
 //Object - Interactions
 #define GRAVITY (glm::vec3(0,-.2,0))
