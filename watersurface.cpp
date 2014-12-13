@@ -1,8 +1,8 @@
 #include "watersurface.h"
 #include "sphereentity.h"
 
-#define WARP_FACTOR 2.0f
-#define FUNC(a, b) (1.0f - cos((sx + (ss *(a)))*(sx + (ss *(a))) + (sz + (ss * (b)))*(sz + (ss * (b))) / WARP_FACTOR))
+//#define WARP_FACTOR 2.0f
+//#define FUNC(a, b) (1.0f - cos((sx + (ss *(a)))*(sx + (ss *(a))) + (sz + (ss * (b)))*(sz + (ss * (b))) / WARP_FACTOR))
 
 WaterSurface::WaterSurface(GLuint shader, int subdivs) :
 	m_height(new GLfloat[(subdivs+1)*(subdivs+1)]), m_vel(new GLfloat[(subdivs+1)*(subdivs+1)])
@@ -59,8 +59,8 @@ void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
 
 	glBindVertexArray(m_vao);
     glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(mat));
-	for(int i = 0; i <= m_subdivs; i++)
-		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs-1), m_total_verts/(m_subdivs-2));
+	for(int i = 0; i < m_subdivs; i++)
+		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs-1), m_total_verts/(m_subdivs-2)-1);
 	glBindVertexArray(0);
 }
 
@@ -172,21 +172,42 @@ void WaterSurface::GenVertsFromHeight() {
   float sx = -0.5;
 	float sz = -0.5;
 	glm::vec3 norm;
-	for (int i=1; i < m_subdivs-1; i++) {
+
+	int i = 1;
+	for (int j=1; j <= m_subdivs-1; j++) {
+		// v1
+		m_verts[m++] = sx + (ss * j);
+		m_verts[m++] = m_height[i*(m_subdivs+1) + j];// + FUNC(i, j);
+		m_verts[m++] = sz + (ss * i);
+		norm = ComputeNormal(i, j);
+		m_verts[m++] = norm.x;
+		m_verts[m++] = norm.y;
+		m_verts[m++] = norm.z;
+
+		// v2
+		m_verts[m++] = sx + (ss * j);
+		m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j];// + FUNC(i+1, j);
+		m_verts[m++] = sz + (ss * (i+1));
+		norm = ComputeNormal(i+1, j);
+		m_verts[m++] = norm.x;
+		m_verts[m++] = norm.y;
+		m_verts[m++] = norm.z;
+	}
+
+	const int lastNorm = 12*(m_subdivs-1)-6;
+	for (int i=2; i < m_subdivs-1; i++) {
 		for (int j=1; j <= m_subdivs-1; j++) {
-			// triangle 1
 			// v1
 			m_verts[m++] = sx + (ss * j);
-			m_verts[m++] = m_height[i*(m_subdivs+1) + j] + FUNC(i, j);
+			m_verts[m++] = m_height[i*(m_subdivs+1) + j];// + FUNC(i, j);
 			m_verts[m++] = sz + (ss * i);
-			norm = ComputeNormal(i, j);
-			m_verts[m++] = norm.x;
-			m_verts[m++] = norm.y;
-			m_verts[m++] = norm.z;
+			m_verts[m] = m_verts[(m++)-lastNorm];
+			m_verts[m] = m_verts[(m++)-lastNorm];
+			m_verts[m] = m_verts[(m++)-lastNorm];
 
 			// v2
 			m_verts[m++] = sx + (ss * j);
-			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j] + FUNC(i+1, j);
+			m_verts[m++] = m_height[(i+1)*(m_subdivs+1) + j];// + FUNC(i+1, j);
 			m_verts[m++] = sz + (ss * (i+1));
 			norm = ComputeNormal(i+1, j);
 			m_verts[m++] = norm.x;

@@ -119,7 +119,7 @@ void main() {
   float F = 0.0f;
   vec3 color = (1-F)*(//ambient_intensity*water_a*k_a +
                       /*water_d*dotProduct*k_d + vec3(specular) + */sphereReflectionColor) +
-               vec3(F*texture(cubeMap, reflectionDir));
+               vec3(F*texture(cubeMap, normalize(reflectionDir+pos+vec3(0,.12,0))));
   clamp(color, 0.0f, 1.0f);
   gl_FragColor = vec4(color, 0.0f);
 }
