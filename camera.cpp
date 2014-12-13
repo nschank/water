@@ -122,7 +122,7 @@ void Camera::translate(const glm::vec4 &v)
 {
   eye += v;
 
-  eye.y = glm::clamp(eye.y, WATER_PLANE_HEIGHT+NEAR_PLANE*2.f, .49f);
+  eye.y = glm::clamp(eye.y, WATER_PLANE_HEIGHT+NEAR_PLANE*5.f, .49f);
 
   calculateView();
 }
