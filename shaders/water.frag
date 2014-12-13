@@ -149,7 +149,8 @@ void main() {
   }
 
 
-  float F = 0.75f;
+  if(reflectionDir.y < 0) reflectionDir *= -1;
+  float F = 0.65f;
   vec3 color = (1-F)*(ambient_intensity*water_a*k_a +
 		      water_d*dotProduct*k_d + vec3(specular) + sphereReflectionColor) +
                vec3(F*texture(cubeMap, normalize(reflectionDir+pos+vec3(0,.12,0))));
