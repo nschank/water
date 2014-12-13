@@ -54,7 +54,7 @@ public:
 	std::vector<glm::vec3> m_impulses;
 	std::vector<glm::vec3> m_setPoints;
 
-    GLfloat *m_vel, *m_height;
+  GLfloat *m_vel, *m_height;
 	GLuint m_vao, m_vbo;
 };
 

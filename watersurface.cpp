@@ -11,36 +11,36 @@ WaterSurface::WaterSurface(GLuint shader, int subdivs) :
 
 	m_verts = new float[2*6*subdivs*(subdivs-1)];
 
-    InitializeHeights();
+  InitializeHeights();
 
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
-    glGenBuffers(1, &m_vbo);
+  glGenVertexArrays(1, &m_vao);
+  glBindVertexArray(m_vao);
+  glGenBuffers(1, &m_vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-    glEnableVertexAttribArray(glGetAttribLocation(shader, "position"));
-    glEnableVertexAttribArray(glGetAttribLocation(shader, "normal"));
+  glEnableVertexAttribArray(glGetAttribLocation(shader, "position"));
+  glEnableVertexAttribArray(glGetAttribLocation(shader, "normal"));
 
-    glVertexAttribPointer(
-                glGetAttribLocation(shader, "position"),
-                3,
-                GL_FLOAT,
-                GL_FALSE,
-                sizeof(GLfloat)*6,
-                (void *)0
-                );
-    glVertexAttribPointer(
-                glGetAttribLocation(shader, "normal"),
-                3,
-                GL_FLOAT,
-                GL_TRUE,
-                sizeof(GLfloat)*6,
-                (void *)(sizeof(GLfloat)*3)
-                );
+  glVertexAttribPointer(
+              glGetAttribLocation(shader, "position"),
+              3,
+              GL_FLOAT,
+              GL_FALSE,
+              sizeof(GLfloat)*6,
+              (void *)0
+              );
+  glVertexAttribPointer(
+              glGetAttribLocation(shader, "normal"),
+              3,
+              GL_FLOAT,
+              GL_TRUE,
+              sizeof(GLfloat)*6,
+              (void *)(sizeof(GLfloat)*3)
+              );
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 	GenVertsFromHeight();
 }
@@ -50,6 +50,8 @@ WaterSurface::~WaterSurface() {
     delete[] m_vel;
     delete[] m_height;
     delete[] m_verts;
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteVertexArrays(1, &m_vao);
 }
 
 void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
@@ -105,26 +107,6 @@ void WaterSurface::UpdateHeights() {
 	std::swap(m_vel, m_height);
 }
 
-/*void WaterSurface::UpdateNormals() {
-    float top, left, right, bottom, center;
-    float cell_dist = 1.0/m_subdivs;
-    for (int i=1; i<m_subdivs; i++) {
-        for (j=1; j<m_subdivs; j++) {
-           center = m_h2[i*(m_subdivs+1) + j];
-           top = m_h2[(i-1)*(m_subdivs+1) + j];
-           bottom = m_h2[(i+1)*(m_subdivs+1) + j];
-           left = m_h2[i*(m_subdivs+1) + j-1];
-           right = m_h2[i*(m_subdivs+1) + j+1];
-
-           glm::vec3(-cell_dist)
-
-           m_normals[i*(m_subdivs+1) + j] =
-
-
-        }
-    }
-}*/
-
 void WaterSurface::ApplyImpulses()
 {
 	for (int i=0; i<m_impulses.size(); i++)
@@ -166,44 +148,41 @@ glm::vec2 WaterSurface::closestDiscretePoint(glm::vec3 continuousPoint)
 
 
 glm::vec3 WaterSurface::ComputeNormal(int i, int j) {
-    float left, right, up, down, height;
-    height = m_height[i*(m_subdivs+1) + j];
-    left = m_height[i*(m_subdivs+1) + j-1];
-    right = m_height[i*(m_subdivs+1) + j+1];
-    up = m_height[(i-1)*(m_subdivs+1) + j];
-    down = m_height[(i+1)*(m_subdivs+1) + j];
+  float left, right, up, down, height;
+  height = m_height[i*(m_subdivs+1) + j];
+  left = m_height[i*(m_subdivs+1) + j-1];
+  right = m_height[i*(m_subdivs+1) + j+1];
+  up = m_height[(i-1)*(m_subdivs+1) + j];
+  down = m_height[(i+1)*(m_subdivs+1) + j];
 
-	float n1 = sqrt(1 + 200*(up - down)*200*(up - down));
-	float n2 = sqrt(1 + 200*(left - right)*200*(left - right));
-    glm::vec3 va = glm::vec3(1.0f/n1, 0.0f, 200*(up - down) / n1);
-    glm::vec3 vb = glm::vec3(0.0f, 1.0f/n2, 200*(left - right) / n2);
+  float n1 = sqrt(1 + 40000.0f*(up - down)*(up - down));
+  float n2 = sqrt(1 + 40000.0f*(left - right)*(left - right));
+  glm::vec3 va = glm::vec3(1.0f/n1, 0.0f, 200*(up - down) / n1);
+  glm::vec3 vb = glm::vec3(0.0f, 1.0f/n2, 200*(left - right) / n2);
 
-    glm::vec3 norm = glm::normalize(glm::cross(va, vb));
-    //glm::vec3 norm = glm::vec3(0.0f, 1.0f, 0.0f);
-    //if (i == 100 && j == 100)
-    //    printf("%f %f %f\n", norm.x, norm.y, norm.z);
+  glm::vec3 norm = glm::normalize(glm::cross(va, vb));
 
-	return glm::vec3(norm.x, norm.z, norm.y);
+  return glm::vec3(norm.x, norm.z, norm.y);
 
 }
 
 void WaterSurface::GenVertsFromHeight() {
-    float ss = 1.0/m_subdivs;
-    int m = 0;
-    float sx = -0.5;
+  float ss = 1.0/m_subdivs;
+  int m = 0;
+  float sx = -0.5;
 	float sz = -0.5;
 	glm::vec3 norm;
 	for (int i=1; i < m_subdivs-1; i++) {
 		for (int j=1; j <= m_subdivs-1; j++) {
-            // triangle 1
-            // v1
-            m_verts[m++] = sx + (ss * j);
-            m_verts[m++] = m_height[i*(m_subdivs+1) + j] + FUNC(i, j);
-            m_verts[m++] = sz + (ss * i);
-            norm = ComputeNormal(i, j);
-            m_verts[m++] = norm.x;
-            m_verts[m++] = norm.y;
-            m_verts[m++] = norm.z;
+			// triangle 1
+			// v1
+			m_verts[m++] = sx + (ss * j);
+			m_verts[m++] = m_height[i*(m_subdivs+1) + j] + FUNC(i, j);
+			m_verts[m++] = sz + (ss * i);
+			norm = ComputeNormal(i, j);
+			m_verts[m++] = norm.x;
+			m_verts[m++] = norm.y;
+			m_verts[m++] = norm.z;
 
 			// v2
 			m_verts[m++] = sx + (ss * j);
@@ -213,16 +192,16 @@ void WaterSurface::GenVertsFromHeight() {
 			m_verts[m++] = norm.x;
 			m_verts[m++] = norm.y;
 			m_verts[m++] = norm.z;
-        }
-    }
-    m_total_verts = (m-1)/6;
+		}
+  }
+  m_total_verts = (m-1)/6;
 	glBindVertexArray(m_vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 6*m_total_verts*sizeof(GLfloat), m_verts, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+  glBufferData(GL_ARRAY_BUFFER, 6*m_total_verts*sizeof(GLfloat), m_verts, GL_DYNAMIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 }
 
 void WaterSurface::applyTranslationAt(glm::vec3 translation, glm::vec3 location)
@@ -232,7 +211,7 @@ void WaterSurface::applyTranslationAt(glm::vec3 translation, glm::vec3 location)
 
 void WaterSurface::applyImpulseAt(glm::vec3 impulse, glm::vec3 location)
 {
-    m_impulses.push_back(impulse + location);
+  m_impulses.push_back(impulse + location);
 }
 
 void WaterSurface::applyForceAt(glm::vec3 force, glm::vec3 location)

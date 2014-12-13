@@ -95,6 +95,8 @@ CubeMap::CubeMap(Camera* cam) {
 
 CubeMap::~CubeMap() {
   glDeleteTextures(1, &cubeTexture);
+  glDeleteBuffers(1, &vbo);
+  glDeleteVertexArrays(1, &vao);
 }
 
 void CubeMap::loadSide(const char* filename, GLenum side) {

@@ -137,11 +137,12 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 								glm::vec3(closestImpulseLocation.x-1, 0, closestImpulseLocation.y-1));
 
 		glm::vec3 vxz = glm::vec3(m_velocity.x, 0, m_velocity.z);
-		applyImpulseAt(-SURFACE_SIDEWAYS_COEFFICIENT * m_mass * glm::pow(1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius, 3.f) * vxz,
+		applyImpulseAt(-SURFACE_SIDEWAYS_COEFFICIENT * m_mass * (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) *
+					   (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) * (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) * vxz,
 					   m_center);
 
 		if(m_center.y-WATER_PLANE_HEIGHT < 0)
-			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y+WATER_PLANE_HEIGHT) * supportingVector, m_center);
+			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y+WATER_PLANE_HEIGHT), m_center);
 	}
 }
 
@@ -152,12 +153,14 @@ void SphereEntity::applyTranslationAt(glm::vec3 translation, glm::vec3 location)
 
 void SphereEntity::applyImpulseAt(glm::vec3 impulse, glm::vec3 location)
 {
-	impulsesThisTick += impulse;
+	if(!glm::isnan(impulse.x) && !glm::isnan(impulse.y) && !glm::isnan(impulse.z))
+		impulsesThisTick += impulse;
 }
 
 void SphereEntity::applyForceAt(glm::vec3 force, glm::vec3 location)
 {
-	forcesThisTick += force;
+	if(!glm::isnan(force.x) && !glm::isnan(force.y) && !glm::isnan(force.z))
+		forcesThisTick += force;
 }
 
 void SphereEntity::tick(float secondsSinceLastTick)
