@@ -33,10 +33,6 @@ CubeMap::CubeMap(Camera* cam) {
   loadSide(frontFilename, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
   loadSide(backFilename, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
   
-  GLint vertex = glGetAttribLocation(cubeTexture, "vertex");
-  glEnableVertexAttribArray(vertex);
-  glVertexAttribPointer(vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
   float size = 0.5f;
 
   GLfloat skyboxVertices[] = {
@@ -97,6 +93,7 @@ CubeMap::~CubeMap() {
   glDeleteTextures(1, &cubeTexture);
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);
+  glDeleteShader(cubemapShader);
 }
 
 void CubeMap::loadSide(const char* filename, GLenum side) {
@@ -108,7 +105,6 @@ void CubeMap::loadSide(const char* filename, GLenum side) {
         h = textureFile.height();
     glTexImage2D(side, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
   }
-  else std::cout << "null image" << std::endl;
 }
 
 void CubeMap::draw() {
