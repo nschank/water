@@ -108,7 +108,7 @@ void main() {
   float t2 = -1.0f;
   vec3 ballNormal2 = vec3(0.0f);
   mat4 ballInvModel2 = inverse(ballModels2);
-  vec4 P2 = ballInvModel2*vec4(pos, 2.0f);
+  vec4 P2 = ballInvModel2*vec4(pos, 1.0f);
   vec4 d2 = ballInvModel2*vec4(reflectionDir, 0.0f);
   float a2 = d2.x*d2.x + d2.y*d2.y + d2.z*d2.z,
         b2 = 2.0f*(P2.x*d2.x + P2.y*d2.y + P2.z*d2.z),
