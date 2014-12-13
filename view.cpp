@@ -191,7 +191,7 @@ void View::mousePressEvent(QMouseEvent *event)
     // throw a sphere in the direction you are looking
 	if(event->button() == Qt::RightButton && m_balls < MAX_BALLS) {
         float force = 0.3f;
-		addSphere(glm::vec3(0, .175f, 0), .05, -force * m_camera->w, 25);
+		addSphere(glm::vec3(0, .175f, 0), .05, -force * m_camera->w, 20);
 		m_balls++;
 	}
 }
@@ -219,6 +219,14 @@ void View::mouseMoveEvent(QMouseEvent *event)
 		  glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
 		  m_water->applyImpulseAt(CLICK_IMPULSE,
 								  glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+		  m_water->applyImpulseAt(CLICK_IMPULSE/4.f,
+								  glm::vec3(discreteLocation.x-1, 0.0f, discreteLocation.y-1));
+		  m_water->applyImpulseAt(CLICK_IMPULSE/4.f,
+								  glm::vec3(discreteLocation.x-1, 0.0f, discreteLocation.y+1));
+		  m_water->applyImpulseAt(CLICK_IMPULSE/4.f,
+								  glm::vec3(discreteLocation.x+1, 0.0f, discreteLocation.y-1));
+		  m_water->applyImpulseAt(CLICK_IMPULSE/4.f,
+								  glm::vec3(discreteLocation.x+1, 0.0f, discreteLocation.y+1));
 	  }
   }
 }

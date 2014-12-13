@@ -114,7 +114,8 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 		if(areaUsed >= requiredArea)
 		{
 			//We should support the velocity as much as we are allowed.
-			applyImpulseAt(-SUPPORTED_VELOCITY_COEFFICIENT * m_velocity.y * m_mass * supportingVector, m_center);
+			applyImpulseAt(-SUPPORTED_VELOCITY_COEFFICIENT * m_velocity.y * m_mass * supportingVector
+						   * (1.f-.5f*float(m_velocity.y > 0)), m_center);
 			//We should experience an upwards force relative to how much area is used
 			applyForceAt(-GRAVITY * m_mass * support, m_center);
 		}
@@ -138,11 +139,11 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 
 		glm::vec3 vxz = glm::vec3(m_velocity.x, 0, m_velocity.z);
 		applyImpulseAt(-SURFACE_SIDEWAYS_COEFFICIENT * m_mass * (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) *
-					   (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) * (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) * vxz,
+					   (1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius) * vxz,
 					   m_center);
 
 		if(m_center.y-WATER_PLANE_HEIGHT < 0)
-			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y+WATER_PLANE_HEIGHT), m_center);
+			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y+WATER_PLANE_HEIGHT) * 5.f, m_center);
 	}
 }
 
@@ -195,6 +196,8 @@ void SphereEntity::tick(float secondsSinceLastTick)
 		m_center.z = m_radius-.5f;
 		m_velocity.z *= -.2f;
 	}
+
+	m_center.y = glm::max(WATER_PLANE_HEIGHT - m_radius - m_radius, m_center.y);
 
 	updateMatrices();
 }
