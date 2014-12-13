@@ -39,6 +39,7 @@ private:
 
     float m_k_a;
     float m_k_d;
+	float m_balls;
 
     glm::vec3 m_object_a, m_object_d, m_i_a,
               m_water_a, m_water_d;

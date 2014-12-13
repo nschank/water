@@ -4,6 +4,7 @@
 #include <iostream>
 
 //Controls
+#define CAMERA_SENSITIVITY (1.f)
 #define CLICK_IMPULSE (glm::vec3(0,-0.05,0))
 #define DEFAULT_TICK_LENGTH (1.f/60.f)
 #define KEYPRESS_FOR_TICK (false)
@@ -31,7 +32,7 @@
 #define POLYGON_MODE false
 #define SPHERE_RESOLUTION (30)
 #define USE_CUBE_MAP true
-#define WATER_RESOLUTION (300)
+#define WATER_RESOLUTION (400)
 
 //Lighting Settings
 #define GLOBAL_AMBIENT_COEFFICIENT 0.2f
@@ -44,21 +45,28 @@
 
 //Water Surface - Interactions
 #define MAX_BUOYANCY (100)
-#define SUPPORT_COEFFICIENT 20.f
-#define SUPPORTED_VELOCITY_COEFFICIENT .075f
+#define SUPPORT_COEFFICIENT 30.f
+#define SUPPORTED_VELOCITY_COEFFICIENT .11f
 #define SURFACE_IMPULSE_COEFFICIENT .15f
-#define SURFACE_SIDEWAYS_COEFFICIENT 0.03f
+#define SURFACE_SIDEWAYS_COEFFICIENT 0.02f
 
 //Water Surface - Settings
+#define BOTTOM_EDGE_HEIGHT .003f
+#define IMPULSE_CAP 1.5f
+#define LEFT_EDGE_HEIGHT .003f
 #define MINIMUM_VELOCITY (-1.5f)
 #define MAXIMUM_VELOCITY (1.5f)
-#define VELOCITY_AVERAGE_FACTOR (2.0f)
-#define VELOCITY_DAMPING_FACTOR (.9995f)
+#define RIGHT_EDGE_HEIGHT .002f
+#define TOP_EDGE_HEIGHT .003f
+#define VELOCITY_AVERAGE_FACTOR (2.f)
+#define VELOCITY_DAMPING_FACTOR (.99f)
+#define WATER_PLANE_HEIGHT -0.12f
 
 //Object - Interactions
-#define GRAVITY (glm::vec3(0,-.098,0))
+#define GRAVITY (glm::vec3(0,-.1,0))
 #define SPHERE_BUOYANCY (70.f)
 #define SPHERE_COR (.2)
+#define MAX_BALLS 6
 
 //Objects - Settings
 #define SPHERE_MASS (100)

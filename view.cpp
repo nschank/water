@@ -41,6 +41,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
 
   //create a World for Entities to live in
   m_world = new World();
+
+  m_balls = 0;
 }
 
 
@@ -57,59 +59,57 @@ View::~View()
 //plz
 void View::initializeGL()
 {
-  // All OpenGL initialization *MUST* be done during or after this
-  // method. Before this method is called, there is no active OpenGL
-  // context and all OpenGL calls have no effect.
+    // All OpenGL initialization *MUST* be done during or after this
+    // method. Before this method is called, there is no active OpenGL
+    // context and all OpenGL calls have no effect.
 
-  glewExperimental = GL_TRUE;
-  GLenum err = glewInit();
-  glGetError(); // Clear errors after call to glewInit
-  if (GLEW_OK != err)
-  {
-    // Problem: glewInit failed, something is seriously wrong.
-    fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
-  }
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    glGetError(); // Clear errors after call to glewInit
+    if (GLEW_OK != err)
+    {
+      // Problem: glewInit failed, something is seriously wrong.
+      fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
+    }
 
-  m_object_shader = ResourceLoader::loadShaders(
-            "shaders/default.vert",
-            "shaders/default.frag");
+	  m_object_shader = ResourceLoader::loadShaders(
+              "shaders/default.vert",
+              "shaders/default.frag");
 
-  m_water_shader = ResourceLoader::loadShaders(
-            "shaders/water.vert",
-            "shaders/water.frag");
+    m_water_shader = ResourceLoader::loadShaders(
+              "shaders/water.vert",
+              "shaders/water.frag");
 
 
-  m_uni["p"] = glGetUniformLocation(m_object_shader, "p");
-  m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
-  m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
+    m_uni["p"] = glGetUniformLocation(m_object_shader, "p");
+    m_uni["m"] = glGetUniformLocation(m_object_shader, "m");
+    m_uni["v"] = glGetUniformLocation(m_object_shader, "v");
 
-  m_camera = new Camera(width(), height());
+    m_camera = new Camera(width(), height());
 
-  m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
-  m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
-  m_world->addEntity(m_water);
-  m_water_transform = glm::translate(glm::vec3(0.0f, -0.12f, 0.0f));
+	m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
+	m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
+	m_world->addEntity(m_water);
+	m_water_transform = glm::translate(glm::vec3(0.0f, WATER_PLANE_HEIGHT, 0.0f));
 
-  std::vector<glm::mat3> normal_matrices;
+	  glEnable(GL_CULL_FACE);
+	  if(POLYGON_MODE)
+		  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	  glEnable(GL_DEPTH_TEST);
 
-  glEnable(GL_CULL_FACE);
-  if(POLYGON_MODE)
-	  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glEnable(GL_DEPTH_TEST);
+    // Start a timer that will try to get 60 frames per second (the actual
+    // frame rate depends on the operating system and other running programs)
+    time.start();
+    timer.start(1000 / 60);
 
-  // Start a timer that will try to get 60 frames per second (the actual
-  // frame rate depends on the operating system and other running programs)
-  time.start();
-  timer.start(1000 / 60);
+    // Center the mouse, which is explained more in mouseMoveEvent() below.
+    // This needs to be done here because the mouse may be initially outside
+    // the fullscreen window and will not automatically receive mouse move
+    // events. This occurs if there are two monitors and the mouse is on the
+    // secondary monitor.
+    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 
-  // Center the mouse, which is explained more in mouseMoveEvent() below.
-  // This needs to be done here because the mouse may be initially outside
-  // the fullscreen window and will not automatically receive mouse move
-  // events. This occurs if there are two monitors and the mouse is on the
-  // secondary monitor.
-  QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
-
-  cubeMap = new CubeMap(m_camera);
+	cubeMap = new CubeMap(m_camera);
 }
 
 void View::paintGL()
@@ -145,10 +145,10 @@ void View::paintGL()
   // draw the m_spheres in their appropriate locations
   glBindVertexArray(m_sphere->m_vao);
 
-	for(int i=0; i < m_sphere_entities.size(); i++) {
-		SphereEntity *current = m_sphere_entities.at(i);
-		glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
-		m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
+  for(int i=0; i < m_sphere_entities.size(); i++) {
+	SphereEntity *current = m_sphere_entities.at(i);
+	glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
+	m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
   }
   glBindVertexArray(0);
   glUseProgram(0);
@@ -167,7 +167,7 @@ void View::paintGL()
   glUniform3fv(glGetUniformLocation(m_water_shader, "cameraPosition"), 1, glm::value_ptr(glm::vec3(m_camera->getEye())));
 
   m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
-	glUseProgram(0);
+  glUseProgram(0);
 }
 
 
@@ -178,21 +178,22 @@ void View::resizeGL(int w, int h)
 
 void View::mousePressEvent(QMouseEvent *event)
 {
-  // affect the water
-  if (event->button() == Qt::LeftButton) {
-      glm::vec3 hit;
-      if (m_camera->CastRayAtObject(&hit, m_water_transform))
-      {
-          glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
-          m_water->applyImpulseAt(CLICK_IMPULSE,
-                                  glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
-      }
-  }
-  // throw a sphere in the direction you are looking
-  if (event->button() == Qt::RightButton) {
-      float force = 0.3f;
-      addSphere(glm::vec3(m_camera->eye), .05, glm::vec3(-force * glm::vec4(m_camera->w, 0.0f)), 1);
-  }
+    // affect the water
+    if (event->button() == Qt::LeftButton) {
+        glm::vec3 hit;
+        if (m_camera->CastRayAtObject(&hit, m_water_transform))
+        {
+            glm::vec2 discreteLocation = m_water->closestDiscretePoint(hit);
+            m_water->applyImpulseAt(CLICK_IMPULSE,
+                                    glm::vec3(discreteLocation.x, 0.0f, discreteLocation.y));
+        }
+    }
+    // throw a sphere in the direction you are looking
+	if(event->button() == Qt::RightButton && m_balls < MAX_BALLS) {
+        float force = 0.3f;
+		addSphere(glm::vec3(0, .175f, 0), .05, -force * m_camera->w, 25);
+		m_balls++;
+	}
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)

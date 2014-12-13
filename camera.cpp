@@ -4,7 +4,7 @@ Camera::Camera(int px_w, int px_h)
 {
   m_px_w = px_w;
   m_px_h = px_h;
-	setClip(NEAR_PLANE, FAR_PLANE);
+  setClip(NEAR_PLANE, FAR_PLANE);
   setHeightAngle(HEIGHT_ANGLE);
   setAspectRatio(1.0f);
 	if(LOOK_SETTING_ACROSS)
@@ -189,13 +189,13 @@ bool Camera::CastRayAtObject(glm::vec3 *hit, glm::mat4x4 model) {
 
 
 void Camera::MouseMoved(int dx, int dy) {
-  // compute the new look vector based upon the old one
+    // compute the new look vector based upon the old one
   float x_ratio = dx/float(m_px_w/2.0);      float y_ratio = dy/float(m_px_h/2.0);
   float real_width = nearPlane*tan((heightAngle*aspectRatio)/2.0);  float real_height = nearPlane*tan(heightAngle/2.0);
   float new_width = real_width * x_ratio;    float new_height = real_height * y_ratio;
   float x_angle = atan(new_width/nearPlane);    float y_angle = atan(new_height/nearPlane);
 
-  float factor = 0.2f;
+  float factor = CAMERA_SENSITIVITY;
 
 
   rotateV(glm::degrees(-x_angle * factor));
