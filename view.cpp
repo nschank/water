@@ -158,7 +158,6 @@ void View::paintGL()
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
 	glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));*/
-    int subdivs = 201;
     glUseProgram(m_water_shader);
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "p"), 1, GL_FALSE, glm::value_ptr(m_camera->getProjectionMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "v"), 1, GL_FALSE, glm::value_ptr(m_camera->getViewMatrix()));
@@ -196,7 +195,7 @@ void View::mousePressEvent(QMouseEvent *event)
     // throw a sphere in the direction you are looking
     if (event->button() == Qt::RightButton) {
         float force = 0.3f;
-		addSphere(glm::vec3(m_camera->eye), .05, -force * m_camera->w, 4);
+		addSphere(glm::vec3(), .05, -force * m_camera->w, 4);
     }
 }
 

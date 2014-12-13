@@ -106,6 +106,7 @@ void CubeMap::loadSide(const char* filename, GLenum side) {
         h = textureFile.height();
     glTexImage2D(side, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bits);
   }
+  else std::cout << "null image" << std::endl;
 }
 
 void CubeMap::draw() {

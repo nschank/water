@@ -74,7 +74,7 @@
 #define TOP_EDGE_HEIGHT .003f
 #define VELOCITY_AVERAGE_FACTOR (2.0f)
 #define VELOCITY_DAMPING_FACTOR (.9995f)
-#define WATER_PLANE_HEIGHT 0.f
+#define WATER_PLANE_HEIGHT -0.1f
 
 //Object - Interactions
 #define GRAVITY (glm::vec3(0,-.098,0))
