@@ -2,16 +2,14 @@
 #include "sphereentity.h"
 
 #define WARP_FACTOR 2.0f
-#define FUNC(a, b) 1.0f - cos((pow((sx + (ss *(a))), 2) + pow((sz + (ss * (b))), 2)) / WARP_FACTOR)
+#define FUNC(a, b) (1.0f - cos((sx + (ss *(a)))*(sx + (ss *(a))) + (sz + (ss * (b)))*(sz + (ss * (b))) / WARP_FACTOR))
 
-WaterSurface::WaterSurface(GLuint shader, int subdivs)
+WaterSurface::WaterSurface(GLuint shader, int subdivs) :
+	m_height(new GLfloat[(subdivs+1)*(subdivs+1)]), m_vel(new GLfloat[(subdivs+1)*(subdivs+1)])
 {
     m_subdivs = subdivs;
 
-    m_vel = new GLfloat[(subdivs+1)*(subdivs+1)];
-    m_height = new GLfloat[(subdivs+1)*(subdivs+1)];
-
-    m_verts = new float[36*subdivs*subdivs];
+	m_verts = new float[2*6*subdivs*(subdivs-1)];
 
     InitializeHeights();
 
@@ -60,12 +58,20 @@ void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
 	glBindVertexArray(m_vao);
     glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(mat));
 	for(int i = 0; i <= m_subdivs; i++)
-		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs+1), m_total_verts/m_subdivs);
+		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs-1), m_total_verts/(m_subdivs-2));
 	glBindVertexArray(0);
 }
 
 void WaterSurface::InitializeHeights() {
     int ind, i, j;
+	for(int t = 0; t <= m_subdivs; t++)
+	{
+		m_height[t] = TOP_EDGE_HEIGHT;
+		m_height[t*(m_subdivs+1)] = LEFT_EDGE_HEIGHT;
+		m_height[(t+1)*(m_subdivs+1) - 1] = RIGHT_EDGE_HEIGHT;
+		m_height[m_subdivs*(m_subdivs+1) + t] = BOTTOM_EDGE_HEIGHT;
+	}
+
     for (i=0; i<m_subdivs+1; i++) {
         for (j=0; j<m_subdivs+1; j++) {
             ind = i*(m_subdivs+1) + j;
@@ -79,11 +85,20 @@ void WaterSurface::InitializeHeights() {
 // really update velocities
 void WaterSurface::UpdateHeights() {
 	// iterate over non edge components
+	for(int t = 0; t <= m_subdivs; t++)
+	{
+		m_height[t] = TOP_EDGE_HEIGHT;
+		m_height[t*(m_subdivs+1)] = LEFT_EDGE_HEIGHT;
+		m_height[(t+1)*(m_subdivs+1) - 1] = RIGHT_EDGE_HEIGHT;
+		m_height[m_subdivs*(m_subdivs+1) + t] = BOTTOM_EDGE_HEIGHT;
+	}
+
 	for(int i=1; i<m_subdivs; i++) {
 		for(int j=1; j<m_subdivs;j++) {
 			m_vel[i*(m_subdivs+1) + j] = glm::clamp(((m_height[(i+1)*(m_subdivs+1) + j] + m_height[(i-1)*(m_subdivs+1) + j] +
 					m_height[i*(m_subdivs+1) + (j+1)] + m_height[i*(m_subdivs+1) + (j-1)])/VELOCITY_AVERAGE_FACTOR
-					- m_vel[i*(m_subdivs+1) + j]) * VELOCITY_DAMPING_FACTOR, MINIMUM_VELOCITY, MAXIMUM_VELOCITY);
+					- glm::clamp(m_vel[i*(m_subdivs+1) + j], MINIMUM_VELOCITY, MAXIMUM_VELOCITY))
+					* VELOCITY_DAMPING_FACTOR, MINIMUM_VELOCITY, MAXIMUM_VELOCITY);
 			//m_vel[i*(m_subdivs+1) + j] = glm::min(0.5f, m_h1[i*(m_subdivs+1) + j]);
 		}
 	}
@@ -115,7 +130,10 @@ void WaterSurface::ApplyImpulses()
 	for (int i=0; i<m_impulses.size(); i++)
 	{
 		glm::vec3 impulse = m_impulses.at(i);
-		velocityAt(glm::vec2(impulse.x, impulse.z)) += impulse.y;
+		if(impulse.x < 1 || impulse.x > m_subdivs-1 || impulse.z < 1 || impulse.x > m_subdivs-1)
+			continue;
+
+		velocityAt(glm::vec2(impulse.x, impulse.z)) += glm::clamp(impulse.y, -IMPULSE_CAP, IMPULSE_CAP);
 	}
 	m_impulses.clear();
 }
@@ -155,10 +173,8 @@ glm::vec3 WaterSurface::ComputeNormal(int i, int j) {
     up = m_height[(i-1)*(m_subdivs+1) + j];
     down = m_height[(i+1)*(m_subdivs+1) + j];
 
-    glm::vec2 step(1.0, 0);
-
-    float n1 = sqrt(1 + pow(200*(up - down), 2));
-    float n2 = sqrt(1 + pow(200*(left - right), 2));
+	float n1 = sqrt(1 + 200*(up - down)*200*(up - down));
+	float n2 = sqrt(1 + 200*(left - right)*200*(left - right));
     glm::vec3 va = glm::vec3(1.0f/n1, 0.0f, 200*(up - down) / n1);
     glm::vec3 vb = glm::vec3(0.0f, 1.0f/n2, 200*(left - right) / n2);
 
@@ -177,8 +193,8 @@ void WaterSurface::GenVertsFromHeight() {
     float sx = -0.5;
 	float sz = -0.5;
 	glm::vec3 norm;
-	for (int i=0; i < m_subdivs; i++) {
-		for (int j=0; j <= m_subdivs; j++) {
+	for (int i=1; i < m_subdivs-1; i++) {
+		for (int j=1; j <= m_subdivs-1; j++) {
             // triangle 1
             // v1
             m_verts[m++] = sx + (ss * j);

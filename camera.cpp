@@ -200,8 +200,7 @@ void Camera::MouseMoved(int dx, int dy) {
     float new_width = real_width * x_ratio;    float new_height = real_height * y_ratio;
     float x_angle = atan(new_width/nearPlane);    float y_angle = atan(new_height/nearPlane);
 
-    float factor = 2.0f;
-
+	float factor = CAMERA_SENSITIVITY;
 
     rotateV(glm::degrees(-x_angle * factor));
     rotateU(glm::degrees(-y_angle * factor));

@@ -40,12 +40,6 @@ View::View(QWidget *parent) : QGLWidget(parent)
 
 	//create a World for Entities to live in
 	m_world = new World();
-
-	/*addSphere(glm::vec3(-.4,.3,0), .05, glm::vec3(0,0,0), 1);
-	addSphere(glm::vec3(-.2,.3,0), .05, glm::vec3(0,0,0), 15);
-	addSphere(glm::vec3(0,.3,0), .05, glm::vec3(0,0,0), 30);
-	addSphere(glm::vec3(.2,.3,0), .05, glm::vec3(0,0,0), 45);
-	addSphere(glm::vec3(.4,.3,0), .05, glm::vec3(0,0,0), 60);*/
 }
 
 
@@ -93,9 +87,7 @@ void View::initializeGL()
 	m_sphere = new Sphere(m_object_shader, SPHERE_RESOLUTION);
 	m_water = new WaterSurface(m_water_shader, WATER_RESOLUTION);
 	m_world->addEntity(m_water);
-    m_water_transform = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
-
-	std::vector<glm::mat3> normal_matrices;
+	m_water_transform = glm::translate(glm::vec3(0.0f, WATER_PLANE_HEIGHT, 0.0f));
 
 	glEnable(GL_CULL_FACE);
 	if(POLYGON_MODE)
@@ -202,7 +194,7 @@ void View::mousePressEvent(QMouseEvent *event)
     // throw a sphere in the direction you are looking
     if (event->button() == Qt::RightButton) {
         float force = 0.3f;
-        addSphere(glm::vec3(m_camera->eye), .05, glm::vec3(-force * glm::vec4(m_camera->w, 0.0f)), 1);
+		addSphere(glm::vec3(m_camera->eye), .05, -force * m_camera->w, 4);
     }
 }
 

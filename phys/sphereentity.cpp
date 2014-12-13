@@ -53,7 +53,7 @@ void SphereEntity::collideWithSphere(SphereEntity *other)
 
 void SphereEntity::collideWithSurface(WaterSurface *surface)
 {
-	if(m_center.y - m_radius > 1.5) //ball is too high up
+	if(m_center.y - m_radius > MAXIMUM_VELOCITY-WATER_PLANE_HEIGHT) //ball is too high up
 		return;
 
 	glm::vec2 upperLeft = surface->closestDiscretePoint(m_center - glm::vec3(m_radius+surface->getResolution()));
@@ -77,7 +77,7 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 			if(glm::sqrt(x_dist+z_dist) > m_radius)
 				continue; //inside square, not circle here
 
-			float y = surface->heightAt(glm::vec2(x_i,z_i));
+			float y = surface->heightAt(glm::vec2(x_i,z_i))+WATER_PLANE_HEIGHT;
 			float y_dist = m_center.y >= y ? (y - m_center.y)*(y - m_center.y) : 0;
 			possiblePoints++;
 
@@ -88,15 +88,16 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 			if(glm::isnan(ball_y)) ball_y = m_center.y;
 
 			supportingPoints++;
-			supportingVector += 1.f/(.01f+glm::abs(y))*(m_center - glm::vec3(x,y,z));
+			supportingVector += (m_center - glm::vec3(x,y,z));
 
-			surface->setPoint(glm::vec2(x_i,z_i), ball_y);
+			surface->setPoint(glm::vec2(x_i,z_i), ball_y-WATER_PLANE_HEIGHT);
 		}
 	}
 
 	if(supportingPoints > 0)
 	{
-		supportingVector /= supportingVector.y;
+		if(!(EQ(supportingVector.y,0)))
+			supportingVector /= supportingVector.y;
 
 		glm::vec2 closestImpulseLocation = surface->closestDiscretePoint(m_center - supportingVector*m_radius);
 
@@ -136,10 +137,11 @@ void SphereEntity::collideWithSurface(WaterSurface *surface)
 								glm::vec3(closestImpulseLocation.x-1, 0, closestImpulseLocation.y-1));
 
 		glm::vec3 vxz = glm::vec3(m_velocity.x, 0, m_velocity.z);
-		applyImpulseAt(-SURFACE_SIDEWAYS_COEFFICIENT * m_mass * glm::pow(1-m_center.y/m_radius, 3.f) * vxz, m_center);
+		applyImpulseAt(-SURFACE_SIDEWAYS_COEFFICIENT * m_mass * glm::pow(1-(m_center.y-WATER_PLANE_HEIGHT)/m_radius, 3.f) * vxz,
+					   m_center);
 
-		if(m_center.y < 0)
-			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y) * supportingVector, m_center);
+		if(m_center.y-WATER_PLANE_HEIGHT < 0)
+			this->applyForceAt(-GRAVITY * m_mass * (1-m_center.y+WATER_PLANE_HEIGHT) * supportingVector, m_center);
 	}
 }
 
@@ -166,8 +168,31 @@ void SphereEntity::tick(float secondsSinceLastTick)
 	forcesThisTick = glm::vec3();
 
 	m_center += (m_velocity * secondsSinceLastTick);
-	m_center.x = glm::clamp(m_center.x, -.5f+m_radius, .5f-m_radius);
-	m_center.z = glm::clamp(m_center.z, -.5f+m_radius, .5f-m_radius);
+
+	if(m_center.x+m_radius > .5f)
+	{
+		m_center.x = .5f-m_radius;
+		m_velocity.x *= -.2f;
+	}
+
+	if(m_center.x-m_radius < -.5f)
+	{
+		m_center.x = m_radius-.5f;
+		m_velocity.x *= -.2f;
+	}
+
+	if(m_center.z+m_radius > .5f)
+	{
+		m_center.z = .5f-m_radius;
+		m_velocity.z *= -.2f;
+	}
+
+	if(m_center.z-m_radius < -.5f)
+	{
+		m_center.z = m_radius-.5f;
+		m_velocity.z *= -.2f;
+	}
+
 	updateMatrices();
 }
 
