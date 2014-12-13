@@ -16,8 +16,6 @@ uniform mat3 ballNormalMatrices1;
 uniform mat4 ballModels1;
 uniform mat3 ballNormalMatrices2;
 uniform mat4 ballModels2;
-uniform mat3 ballNormalMatrices3;
-uniform mat4 ballModels3;
 
 in vec3 pos;
 in vec3 norm;
@@ -31,7 +29,7 @@ void main() {
   float specular = 0.0f;
   if(dotProduct > 0.0f) {
     vec3 reflected = reflect(-lightDirection, norm);
-    float specularAngle = max(0.0f, dot(reflected, normalize(pos-cameraPosition)));
+    float specularAngle = max(0.0f, dot(reflected, normalize(pos)));
     specular = pow(specularAngle, 5.0f); // using a specular exponent of 5
   }
 
@@ -140,48 +138,15 @@ void main() {
     t2 = t;
   }
 
-  float t3 = -1.0f;
-  vec3 ballNormal3 = vec3(0.0f);
-  mat4 ballInvModel3 = inverse(ballModels3);
-  vec4 P3 = ballInvModel3*vec4(pos, 3.0f);
-  vec4 d3 = ballInvModel3*vec4(reflectionDir, 0.0f);
-  float a3 = d3.x*d3.x + d3.y*d3.y + d3.z*d3.z,
-        b3 = 3.0f*(P3.x*d3.x + P3.y*d3.y + P3.z*d3.z),
-        c3 = P3.x*P3.x + P3.y*P3.y + P3.z*P3.z - 0.35f;
-  float disc3 = b3*b3 - 4.0f*a3*c3;
-  if(disc3 >= 0.0f) {
-    float first = (-b3 + sqrt(disc3))/(3.0f*a3),
-          second = (-b3 - sqrt(disc3))/(3.0f*a3);
-    float t = -1.0f;
-    bool firstNonNeg = false,
-         secondNonNeg = false;
-    if(first >= 0.0f) {
-      firstNonNeg = true;
-    }
-    if(second >= 0.0f) {
-      secondNonNeg = true;
-    }
-    if(firstNonNeg && first <= second) {
-      t = first;
-      vec4 objectPoint = P3 + t*d3;
-      ballNormal3 = normalize(ballNormalMatrices3*vec3(objectPoint));
-    } else if(secondNonNeg) {
-      t = second;
-      vec4 objectPoint = P3 + t*d3;
-      ballNormal3 = normalize(ballNormalMatrices3*vec3(objectPoint));
-    }
-    t3 = t;
-  }
-
-  if(((t1 > 0.0f && t0 < t1) && (t3 > 0.0f && t0 < t3) && (t2 > 0.0f && t0 < t2) && t0 > 0.0f) || (t0>0.0f && t1<0.0f && t2<0.0f && t3<0.0f)) {
+  if(((t1 > 0.0f && t0 < t1) && (t2 > 0.0f && t0 < t2) && t0 > 0.0f) || (t0>0.0f && t1<0.0f && t2<0.0f)) {
     vec3 spherePos = pos + t0*reflectionDir;
     float d = max(0.0f, dot(ballNormal0, normalize(light - spherePos)));
     sphereReflectionColor = object_d*d;
-  } else if(((t0 > 0.0f && t1 < t0) && (t3 > 0.0f && t1 < t3) && (t2 > 0.0f && t1 < t2) && t1 > 0.0f) || (t1>0.0f && t0<0.0f && t2<0.0f && t3<0.0f)) {
+  } else if(((t0 > 0.0f && t1 < t0) && (t2 > 0.0f && t1 < t2) && t1 > 0.0f) || (t1>0.0f && t0<0.0f && t2<0.0f)) {
     vec3 spherePos = pos + t1*reflectionDir;
     float d = max(0.0f, dot(ballNormal1, normalize(light - spherePos)));
     sphereReflectionColor = object_d*d;
-  } else if(((t0 > 0.0f && t2 < t0) && (t3 > 0.0f && t2 < t3) && (t1 > 0.0f && t2 < t1) && t2 > 0.0f) || (t2>0.0f && t0<0.0f && t1<0.0f && t3<0.0f)) {
+  } else if(((t0 > 0.0f && t2 < t0) && (t1 > 0.0f && t2 < t1) && t2 > 0.0f) || (t2>0.0f && t0<0.0f && t1<0.0f)) {
     vec3 spherePos = pos + t2*reflectionDir;
     float d = max(0.0f, dot(ballNormal2, normalize(light - spherePos)));
     sphereReflectionColor = object_d*d;
@@ -190,7 +155,7 @@ void main() {
 
   float F = 0.75f;
   vec3 color = (1-F)*(ambient_intensity*water_a*k_a +
-		      water_d*dotProduct*k_d + vec3(specular) + sphereReflectionColor) +
+                      water_d*dotProduct*k_d + vec3(specular) + sphereReflectionColor) +
                vec3(F*texture(cubeMap, normalize(reflectionDir+pos+vec3(0,.12,0))));
   clamp(color, 0.0f, 1.0f);
   gl_FragColor = vec4(color, 0.0f);
