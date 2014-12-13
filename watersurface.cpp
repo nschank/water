@@ -59,8 +59,8 @@ void WaterSurface::Draw(glm::mat4x4 mat, GLuint model) {
 
 	glBindVertexArray(m_vao);
     glUniformMatrix4fv(model, 1, GL_FALSE, glm::value_ptr(mat));
-	for(int i = 0; i <= m_subdivs; i++)
-		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs-1), m_total_verts/(m_subdivs-2));
+	for(int i = 0; i < m_subdivs; i++)
+		glDrawArrays(GL_TRIANGLE_STRIP, 2*i*(m_subdivs-1), m_total_verts/(m_subdivs-2)-1);
 	glBindVertexArray(0);
 }
 

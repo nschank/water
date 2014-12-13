@@ -11,12 +11,13 @@
 #define SCROLL_TICK .0005f
 
 //Camera Settings
+#define ASPECT_RATIO 16.f/9.f
 #define FAR_PLANE 3.f
 #define HEIGHT_ANGLE 60.f
 #define NEAR_PLANE 0.001f
 //  different types of default camera placements
 //  default is looking directly down upon the water
-#define LOOK_SETTING_ACROSS true
+#define LOOK_SETTING_ACROSS false
 
 
 // Cubemap Settings
@@ -30,9 +31,9 @@
 
 //Render Settings
 #define POLYGON_MODE false
-#define SPHERE_RESOLUTION (30)
+#define SPHERE_RESOLUTION (50)
 #define USE_CUBE_MAP true
-#define WATER_RESOLUTION (350)
+#define WATER_RESOLUTION (500)
 
 //Lighting Settings
 #define GLOBAL_AMBIENT_COEFFICIENT 0.2f
@@ -51,22 +52,22 @@
 #define SURFACE_SIDEWAYS_COEFFICIENT 0.02f
 
 //Water Surface - Settings
-#define BOTTOM_EDGE_HEIGHT .003f
+#define BOTTOM_EDGE_HEIGHT .002f
 #define IMPULSE_CAP 1.5f
-#define LEFT_EDGE_HEIGHT .003f
+#define LEFT_EDGE_HEIGHT .0015f
 #define MINIMUM_VELOCITY (-1.5f)
 #define MAXIMUM_VELOCITY (1.5f)
-#define RIGHT_EDGE_HEIGHT .002f
-#define TOP_EDGE_HEIGHT .003f
+#define RIGHT_EDGE_HEIGHT .001f
+#define TOP_EDGE_HEIGHT .0005f
 #define VELOCITY_AVERAGE_FACTOR (2.f)
-#define VELOCITY_DAMPING_FACTOR (.995f)
+#define VELOCITY_DAMPING_FACTOR (.993f)
 #define WATER_PLANE_HEIGHT -0.12f
 
 //Object - Interactions
-#define GRAVITY (glm::vec3(0,-.1,0))
+#define GRAVITY (glm::vec3(0,-.2,0))
 #define SPHERE_BUOYANCY (70.f)
 #define SPHERE_COR (.2)
-#define MAX_BALLS 6
+#define MAX_BALLS 10
 
 //Objects - Settings
 #define SPHERE_MASS (100)
