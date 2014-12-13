@@ -10,8 +10,6 @@ uniform mat3 normal_matrix;
 
 out vec3 pos;
 out vec3 norm;
-out mat4 view;
-out vec3 vertexToEye;
 
 out vec3 out_normal;
 
@@ -20,6 +18,4 @@ void main()
     gl_Position = p*v*m * vec4(position, 1.0f);
     pos = vec3(m * vec4(position, 1.0f));
     norm = normalize(normal_matrix * normalize(normal));
-    view = v;
-    vertexToEye = -normalize(pos);
 }

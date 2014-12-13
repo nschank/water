@@ -23,15 +23,16 @@ View::View(QWidget *parent) : QGLWidget(parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     // ambient and diffuse coefficients
-	m_k_a = GLOBAL_AMBIENT_COEFFICIENT;
-	m_k_d = GLOBAL_DIFFUSE_COEFFICIENT;
+	  m_k_a = GLOBAL_AMBIENT_COEFFICIENT;
+	  m_k_d = GLOBAL_DIFFUSE_COEFFICIENT;
+	  
     // ambient intensity
-	m_i_a = GLOBAL_AMBIENT_INTENSITY;
+	  m_i_a = GLOBAL_AMBIENT_INTENSITY;
 
     // object ambient color
-	m_object_a = SPHERE_AMBIENT_COLOR;
+	  m_object_a = SPHERE_AMBIENT_COLOR;
     // object diffuse color
-	m_object_d = SPHERE_DIFFUSE_COLOR;
+	  m_object_d = SPHERE_DIFFUSE_COLOR;
 
     // water ambient and diffuse colors
 	m_water_a = WATER_AMBIENT_COLOR;
@@ -69,13 +70,13 @@ void View::initializeGL()
       fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
     }
 
-	m_object_shader = ResourceLoader::loadShaders(
-            "shaders/default.vert",
-            "shaders/default.frag");
+	  m_object_shader = ResourceLoader::loadShaders(
+              "shaders/default.vert",
+              "shaders/default.frag");
 
     m_water_shader = ResourceLoader::loadShaders(
-            "shaders/water.vert",
-            "shaders/water.frag");
+              "shaders/water.vert",
+              "shaders/water.frag");
 
 
     m_uni["p"] = glGetUniformLocation(m_object_shader, "p");
@@ -89,10 +90,10 @@ void View::initializeGL()
 	m_world->addEntity(m_water);
 	m_water_transform = glm::translate(glm::vec3(0.0f, WATER_PLANE_HEIGHT, 0.0f));
 
-	glEnable(GL_CULL_FACE);
-	if(POLYGON_MODE)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glEnable(GL_DEPTH_TEST);
+	  glEnable(GL_CULL_FACE);
+	  if(POLYGON_MODE)
+		  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	  glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
@@ -164,10 +165,11 @@ void View::paintGL()
     //glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "m"), 1, GL_FALSE, glm::value_ptr(m_water_transform));
     glUniform1f(glGetUniformLocation(m_water_shader, "k_a"), m_k_a);
     glUniform1f(glGetUniformLocation(m_water_shader, "k_d"), m_k_d);
-    glUniform3fv(glGetUniformLocation(m_water_shader, "object_a"), 1, glm::value_ptr(m_object_a));
-    glUniform3fv(glGetUniformLocation(m_water_shader, "object_d"), 1, glm::value_ptr(m_object_d));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "water_a"), 1, glm::value_ptr(m_water_a));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "water_d"), 1, glm::value_ptr(m_water_d));
     glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));
     glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(m_water_transform)))));
+    glUniform3fv(glGetUniformLocation(m_water_shader, "cameraPosition"), 1, glm::value_ptr(glm::vec3(m_camera->getEye())));
 
     m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
 	glUseProgram(0);
