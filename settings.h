@@ -4,7 +4,7 @@
 #include <iostream>
 
 //Controls
-#define CAMERA_SENSITIVITY (1.f)
+#define CAMERA_SENSITIVITY (.2f)
 #define CLICK_IMPULSE (glm::vec3(0,-0.05,0))
 #define DEFAULT_TICK_LENGTH (1.f/60.f)
 #define KEYPRESS_FOR_TICK (false)

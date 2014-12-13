@@ -124,7 +124,7 @@ void View::paintGL()
   int err;
   if ((err = glGetError()) != GL_NO_ERROR) {
       fprintf(stderr, "GL is in an error state before painting.\n");
-      fprintf(stderr, "(GL error code %d)\n", err);
+      //fprintf(stderr, "(GL error code %s)\n", err);
   }
 
   m = glm::translate(glm::vec3(-1.0/100, 0.0, 0.0))*m;
@@ -150,9 +150,9 @@ void View::paintGL()
   glBindVertexArray(m_sphere->m_vao);
 
   for(int i=0; i < m_sphere_entities.size(); i++) {
-	SphereEntity *current = m_sphere_entities.at(i);
-	glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
-	m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
+	  SphereEntity *current = m_sphere_entities.at(i);
+	  glUniformMatrix3fv(glGetUniformLocation(m_object_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(current->normalMatrix()));
+	  m_sphere->Draw(current->modelMatrix(), m_uni["m"]);
   }
   glBindVertexArray(0);
   glUseProgram(0);
@@ -169,6 +169,40 @@ void View::paintGL()
   glUniform3fv(glGetUniformLocation(m_water_shader, "ambient_intensity"), 1, glm::value_ptr(m_i_a));
   glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "normal_matrix"), 1, GL_FALSE, glm::value_ptr(glm::mat3x3(glm::transpose(glm::inverse(m_water_transform)))));
   glUniform3fv(glGetUniformLocation(m_water_shader, "cameraPosition"), 1, glm::value_ptr(glm::vec3(m_camera->getEye())));
+  glUniform3fv(glGetUniformLocation(m_water_shader, "object_a"), 1, glm::value_ptr(m_object_a));
+  glUniform3fv(glGetUniformLocation(m_water_shader, "object_d"), 1, glm::value_ptr(m_object_d));
+
+
+  int ballCount = m_sphere_entities.size();
+  glUniform1f(glGetUniformLocation(m_water_shader, "ballCount"), ballCount);
+  glm::mat4x4 *m_sphere_model_matrices = new glm::mat4x4[ballCount];
+  glm::vec3 *m_sphere_pos = new glm::vec3[ballCount];
+  glm::mat3x3 *m_sphere_normal_matrices = new glm::mat3x3[ballCount];
+  for(int i=0; i<ballCount; i++) {
+    SphereEntity *current = m_sphere_entities.at(i);
+    m_sphere_normal_matrices[i] = current->normalMatrix();
+    m_sphere_model_matrices[i] = current->modelMatrix();
+    m_sphere_pos[i] = current->m_center;
+  }
+  if(ballCount > 0) {
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
+  }
+  if(ballCount > 1) {
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->modelMatrix()));
+  }
+    if(ballCount > 2) {
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels0"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(0)->modelMatrix()));
+  glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(1)->modelMatrix()));
+    glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->normalMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels1"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->modelMatrix()));
+  }
+
 
   m_water->Draw(m_water_transform, glGetUniformLocation(m_water_shader, "m"));
   glUseProgram(0);
