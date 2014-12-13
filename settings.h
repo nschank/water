@@ -67,7 +67,7 @@
 #define GRAVITY (glm::vec3(0,-.2,0))
 #define SPHERE_BUOYANCY (70.f)
 #define SPHERE_COR (.2)
-#define MAX_BALLS 10
+#define MAX_BALLS 3
 
 //Objects - Settings
 #define SPHERE_MASS (100)
