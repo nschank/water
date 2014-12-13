@@ -24,7 +24,7 @@
 #define LEFT_IMG "emerald/emerald_right.jpg"
 #define RIGHT_IMG "emerald/emerald_left.jpg"
 #define TOP_IMG "emerald/emerald_top.jpg"
-#define BOTTOM_IMG "emerald/lake1_dn.JPG"
+#define BOTTOM_IMG "emerald/nopeeking.jpg"
 #define FRONT_IMG "emerald/emerald_front.jpg"
 #define BACK_IMG "emerald/emerald_back.jpg"
 
