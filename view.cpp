@@ -197,7 +197,7 @@ void View::paintGL()
 
   if(m_balls > 2){
   glUniformMatrix3fv(glGetUniformLocation(m_water_shader, "ballNormalMatrices2"), 1, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->normalMatrix()));
-  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels4"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->modelMatrix()));
+  glUniformMatrix4fv(glGetUniformLocation(m_water_shader, "ballModels2"), 2, GL_FALSE, glm::value_ptr(m_sphere_entities.at(2)->modelMatrix()));
   }
 
   if(m_balls > 3){
