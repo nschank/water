@@ -19,24 +19,10 @@
 
 
 // Cubemap Settings
-/*#define LEFT_IMG "lagoon_dn.tga"
-#define RIGHT_IMG "lagoon_rt.tga"
-#define TOP_IMG "lagoon_dn.tga"
-#define BOTTOM_IMG "lagoon_dn.tga"
-#define FRONT_IMG "lagoon_ft.tga"
-#define BACK_IMG "lagoon_bk.tga"*/
-
-/*#define LEFT_IMG "sor_lake1/lake1_lf.JPG"
-#define RIGHT_IMG "sor_lake1/lake1_rt.JPG"
-#define TOP_IMG "sor_lake1/lake1_up.JPG"
-#define BOTTOM_IMG "sor_lake1/lake1_dn.JPG"
-#define FRONT_IMG "sor_lake1/lake1_ft.JPG"
-#define BACK_IMG "sor_lake1/lake1_bk.JPG"*/
-
 #define LEFT_IMG "emerald/emerald_right.jpg"
 #define RIGHT_IMG "emerald/emerald_left.jpg"
 #define TOP_IMG "emerald/emerald_top.jpg"
-#define BOTTOM_IMG "sor_lake1/lake1_dn.JPG"
+#define BOTTOM_IMG "emerald/lake1_dn.JPG"
 #define FRONT_IMG "emerald/emerald_front.jpg"
 #define BACK_IMG "emerald/emerald_back.jpg"
 
@@ -53,8 +39,8 @@
 #define GLOBAL_DIFFUSE_COEFFICIENT 0.8f
 #define SPHERE_AMBIENT_COLOR glm::vec3(1.0, 0.6, 0.6)
 #define SPHERE_DIFFUSE_COLOR glm::vec3(1.0, 0.2, 0.2)
-#define WATER_AMBIENT_COLOR glm::vec3(0.0, 0.8, 1.0)
-#define WATER_DIFFUSE_COLOR glm::vec3(0.0, 0.8, 1.0)
+#define WATER_AMBIENT_COLOR glm::vec3(0.36882352941176473, 0.57470588235294116, 0.53725490196078434)
+#define WATER_DIFFUSE_COLOR glm::vec3(0.36882352941176473, 0.57470588235294116, 0.53725490196078434)
 
 //Water Surface - Interactions
 #define MAX_BUOYANCY (100)
