@@ -550,8 +550,10 @@ d$$$$$$$$$$$"                 .,.  ""??$$$$$$$$$$cc,.   -<.."4MMMMMM>' ' `
 ############
 # COMMENTS #
 ############
-The camera is controlled by moving the mouse to change where it is looking, and scrolling the mouse wheel to move the camera.  You can throw balls into the scene by right clicking.
-We split our code into several different classes representing the different logical components of the project (the spheres, the water surface, the skybox, etc.)  Additoinally, we also have a settings file (settings.h) where we can modify different parameters for the program all from once place.  This was immensely helpful when tuning the coefficients for the physics engine. 
+The camera is controlled by moving the mouse to change where it is looking, and scrolling the mouse wheel to move the camera.  You can throw balls into the scene by right clicking, they all start at (0, 0.5, 0) and are shot in the direction of the look vector.
+We split our code into several different classes representing the different logical components of the project (the spheres, the water surface, the skybox, etc.)  Additoinally, we also have a settings file (settings.h) where we can modify different parameters for the program all from once place.  This was immensely helpful when tuning the coefficients for the physics engine.
+
+
 
 ########
 # BUGS #

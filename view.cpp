@@ -52,9 +52,13 @@ View::~View()
   delete m_camera;
   delete cubeMap;
 	delete m_world;
+	delete m_water;
 
 	for(std::vector<SphereEntity *>::iterator it = m_sphere_entities.begin(); it != m_sphere_entities.end(); it++)
 		delete (*it);
+
+  glDeleteShader(m_water_shader);
+  glDeleteShader(m_object_shader);
 }
 //plz
 void View::initializeGL()
@@ -95,7 +99,7 @@ void View::initializeGL()
 	  glEnable(GL_CULL_FACE);
 	  if(POLYGON_MODE)
 		  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	  glEnable(GL_DEPTH_TEST);
+//	  glEnable(GL_DEPTH_TEST);
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
